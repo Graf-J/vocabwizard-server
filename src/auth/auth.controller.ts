@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -9,11 +9,14 @@ export class AuthController {
 
   @Post('/login')
   login(@Body() loginUserDto: LoginUserDto) {
-    return 'Login'
+    return 'Login';
   }
 
   @Post('/register')
-  register(@Body() createAuthDto: RegisterUserDto) {
-    return 'Register'
+  async register(@Body() registerUserDto: RegisterUserDto) {
+    const user =  await this.authService.register(registerUserDto);
+    const jwt = await this.authService.generateJWT(user.id, user.role)
+
+    return { 'AccessToken': jwt }
   }
 }
