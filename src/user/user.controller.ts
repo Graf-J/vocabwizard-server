@@ -1,7 +1,12 @@
-import { Controller, Get, Param, Delete, ConflictException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Delete, UseGuards, Req, ConflictException } from '@nestjs/common';
 import { UserService } from './user.service';
-import { isValidObjectId } from 'mongoose';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { RequiredRole } from 'src/auth/decorator/required-role.decorator';
+import { Role } from './roles.enum';
+import { RoleGuard } from 'src/auth/guard/role.guard';
 
+@UseGuards(AuthGuard, RoleGuard)
+@RequiredRole(Role.administrator)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -21,7 +26,11 @@ export class UserController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Req() request, @Param('id') id: string) {
+    if (request.user.id === id) {
+      throw new ConflictException('You are not allowed to delete yourself')
+    }
+
     return this.userService.remove(id);
   }
 }
