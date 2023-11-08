@@ -1,22 +1,27 @@
-import { Controller, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Delete, ConflictException, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
+import { isValidObjectId } from 'mongoose';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
+  async findAll() {
+    const users = await this.userService.findAll();
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+    return users.map(mongoUser => {
+      return {
+        id: mongoUser.id,
+        name: mongoUser.name,
+        role: mongoUser.role,
+        createdAt: mongoUser.createdAt,
+      };
+    });
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return this.userService.remove(id);
   }
 }

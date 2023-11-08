@@ -1,15 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { RegisterUserDto } from '../auth/dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-  ) {}
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
   async create(registerUserDto: RegisterUserDto) {
     const user = new this.userModel({
@@ -20,19 +19,28 @@ export class UserService {
     return await user.save();
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    return await this.userModel.find();
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    return await this.userModel.findById(id);
   }
 
   async findOneByName(name: string) {
     return await this.userModel.findOne({ name });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new ConflictException('Invalid User-Id');
+    }
+
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new NotFoundException(`User with Id ${ id } not found`)
+    }
+    
+    await this.userModel.deleteOne({ _id: id });
   }
 }
