@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { DeckModule } from './deck/deck.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: '1d' }
     }),
     MongooseModule.forRoot(`${ process.env.MONGO_URI }/vocabwizard`),
+    DeckModule,
   ],
   controllers: [AppController],
   providers: [AppService],

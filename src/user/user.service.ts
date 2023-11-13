@@ -8,8 +8,7 @@ import { Role } from './roles.enum';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
   async create(registerUserDto: RegisterUserDto) {
     // Set Role to Admin if it is the first User
