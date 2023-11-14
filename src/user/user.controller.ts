@@ -31,6 +31,8 @@ export class UserController {
       throw new ConflictException('You are not allowed to delete yourself')
     }
 
+    // TODO: Delete all Decks and Cards
+
     return this.userService.remove(id);
   }
 }

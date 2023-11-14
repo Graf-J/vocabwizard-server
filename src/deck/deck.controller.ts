@@ -64,6 +64,8 @@ export class DeckController {
       throw new ForbiddenException("You are only allowed to delete your own decks");
     }
 
+    // TODO: Delete All Cards
+
     await this.deckService.remove(id);
   }
 }
