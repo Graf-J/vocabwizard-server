@@ -129,15 +129,11 @@ export class CardService {
     return await this.cardModel.find({ deck: deckId });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} card`;
+  async remove(id: string) {
+    await this.cardModel.deleteOne({ _id: id });
   }
 
-  update(id: number, updateCardDto: UpdateCardDto) {
-    return `This action updates a #${id} card`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} card`;
+  async removeCardsFromDecks(deckIds: string[]) {
+    await this.cardModel.deleteMany({ deck: { $in: deckIds } });
   }
 }

@@ -1,14 +1,18 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
-import { Model, isValidObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 import { RegisterUserDto } from '../auth/dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from './roles.enum';
+import { DeckService } from 'src/deck/deck.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly deckService: DeckService
+  ) {}
 
   async create(registerUserDto: RegisterUserDto) {
     // Set Role to Admin if it is the first User
@@ -40,15 +44,6 @@ export class UserService {
   }
 
   async remove(id: string) {
-    if (!isValidObjectId(id)) {
-      throw new ConflictException('Invalid User-Id');
-    }
-
-    const user = await this.findOne(id);
-    if (!user) {
-      throw new NotFoundException(`User with Id ${ id } not found`)
-    }
-    
-    await this.userModel.deleteOne({ _id: id });
+    await this.deckService.removeDecksFromUser(id);
   }
 }

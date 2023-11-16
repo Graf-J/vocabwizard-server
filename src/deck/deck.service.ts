@@ -1,13 +1,17 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Deck, DeckDocument } from './deck.schema';
 import { Model } from 'mongoose';
+import { CardService } from 'src/card/card.service';
 
 @Injectable()
 export class DeckService {
-  constructor(@InjectModel(Deck.name) private readonly deckModel: Model<DeckDocument>) {}
+  constructor(
+    @InjectModel(Deck.name) private readonly deckModel: Model<DeckDocument>,
+    private readonly cardService: CardService
+  ) {}
 
   async create(createDeckDto: CreateDeckDto, creatorId: string) {
     // Check if Deck already exists for User
@@ -53,6 +57,17 @@ export class DeckService {
   }
 
   async remove(id: string) {
-    return await this.deckModel.deleteOne({ _id: id });
+    await Promise.all([
+      this.cardService.removeCardsFromDecks([id]),
+      this.deckModel.deleteOne({ _id: id })
+    ]);
+  }
+
+  async removeDecksFromUser(creatorId: string) {
+    const decks = await this.deckModel.find({ creator: creatorId });
+    await Promise.all([
+      this.deckModel.deleteMany({ creator: creatorId }),
+      this.cardService.removeCardsFromDecks(decks.map(deck => deck._id.toString()))
+    ])
   }
 }
