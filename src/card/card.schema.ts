@@ -6,35 +6,35 @@ export type CardDocument = HydratedDocument<Card>;
 
 @Schema()
 export class Card {
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true })
     word: string;
 
     @Prop({ required: true })
     translation: string;
 
-    @Prop()
-    phonetic: string;
+    @Prop({ default: null })
+    phonetic?: string;
 
-    @Prop()
-    audioLink: string
+    @Prop({ default: null })
+    audioLink?: string
 
-    @Prop()
+    @Prop({ default: [] })
     definitions: string[]
 
-    @Prop()
+    @Prop({ default: [] })
     examples: string[]
 
-    @Prop()
+    @Prop({ default: [] })
     synonyms: string[]
 
-    @Prop()
+    @Prop({ default: [] })
     antonyms: string[]
 
     @Prop({ required: true, default: 1 })
     stage: number
 
-    @Prop({ required: true })
-    expires: Date;
+    @Prop({ default: null })
+    expires?: Date;
 
     @Prop({ 
         required: true,

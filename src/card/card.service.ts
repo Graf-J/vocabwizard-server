@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { Deck } from 'src/deck/deck.schema';
+import { Deck, DeckDocument } from 'src/deck/deck.schema';
 import { Language } from 'src/deck/languages.enum';
 import { TranslatorService } from './translator.service';
 import { LexicalInfoService } from './lexical-info.service';
@@ -20,19 +20,28 @@ export class CardService {
     @InjectModel(Card.name) private readonly cardModel: Model<CardDocument>
   ) {}
 
-  async create(createCardDto: CreateCardDto, deck: Deck) {
-    const { libreTranslateResponse, apiDictionaryResponse } = await this.getExternalData(createCardDto.word.toLowerCase(), deck.fromLang, deck.toLang);
+  async create(createCardDto: CreateCardDto, deck: DeckDocument) {
+    // Validate if Word doesn't already exist
+    const duplicate = await this.cardModel.findOne({ 
+      word: createCardDto.word,
+      deck: deck.id
+    });
+    if (duplicate) {
+      throw new ConflictException(`The word ${ createCardDto.word } already exists in this deck`);
+    }
 
+    // Get data from external APIs
+    const { libreTranslateResponse, apiDictionaryResponse } = await this.getExternalData(createCardDto.word.toLowerCase(), deck.fromLang, deck.toLang);
     let externalData;
     if (!apiDictionaryResponse.error) {
       externalData = this.extractInformation(apiDictionaryResponse.data[0])
     }
 
+    // Insert Card into Database
     const card = new this.cardModel({
       word: createCardDto.word,
       translation: libreTranslateResponse.data.translatedText,
       ...externalData,
-      expires: Date.now(),
       deck: deck,
       createdAt: Date.now()
     })

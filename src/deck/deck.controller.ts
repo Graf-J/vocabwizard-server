@@ -68,7 +68,7 @@ export class DeckController {
       throw new ForbiddenException("You are only allowed to update your own decks");
     }
 
-    return await this.deckService.update(id, updateDeckDto);
+    return await this.deckService.update(id, updateDeckDto, deck.creator.toString());
   }
 
   @Delete(':id')

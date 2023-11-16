@@ -23,7 +23,6 @@ export class LexicalInfoService {
             .pipe(
                 map(res => new ApiResponse<ApiDictionaryResponse[]>(false, res.data)),
                 catchError(error => {
-                    console.log(error.message)
                     Logger.error(`External Request to ${ url } failed`, error);
                     return [new ApiResponse<ApiDictionaryResponse[]>(true)];
                 })

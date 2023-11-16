@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,12 +9,19 @@ import { Model } from 'mongoose';
 export class DeckService {
   constructor(@InjectModel(Deck.name) private readonly deckModel: Model<DeckDocument>) {}
 
-  async create({ name, learningRate, fromLang, toLang}: CreateDeckDto, creatorId: string) {
+  async create(createDeckDto: CreateDeckDto, creatorId: string) {
+    // Check if Deck already exists for User
+    const duplicate = await this.deckModel.findOne({ 
+      name: createDeckDto.name,
+      creator: creatorId
+    })
+    if (duplicate) {
+      throw new ConflictException(`The Deck ${ createDeckDto.name } already exists`);
+    }
+
+    // Insert Deck into Database
     const deck = new this.deckModel({
-      name,
-      learningRate,
-      fromLang,
-      toLang,
+      ...createDeckDto,
       creator: creatorId,
       createdAt: Date.now(),
     });
@@ -29,7 +36,15 @@ export class DeckService {
     return await this.deckModel.findById(id);
   }
 
-  async update(id: string, updateDeckDto: UpdateDeckDto) {
+  async update(id: string, updateDeckDto: UpdateDeckDto, creatorId: string) {
+    const duplicate = await this.deckModel.findOne({ 
+      name: updateDeckDto.name,
+      creator: creatorId
+    })
+    if (duplicate) {
+      throw new ConflictException(`The Deck ${ updateDeckDto.name } already exists`);
+    }
+
     return await this.deckModel.findByIdAndUpdate(
       id,
       { $set: updateDeckDto },

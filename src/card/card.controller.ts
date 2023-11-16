@@ -1,11 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException, NotFoundException, ForbiddenException, Req } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
-import { UpdateCardDto } from './dto/update-card.dto';
-import { TranslatorService } from './translator.service';
-import { Language } from 'src/deck/languages.enum';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { LexicalInfoService } from './lexical-info.service';
 import { isValidObjectId } from 'mongoose';
 import { DeckService } from 'src/deck/deck.service';
 import { Role } from 'src/user/roles.enum';
@@ -24,7 +20,6 @@ export class CardController {
     if (!isValidObjectId(deckId)) {
       throw new BadRequestException(`Id '${ deckId }' is not valid`);
     }
-    // TODO: Check for duplicates (best solution would be on Database Schema level)
 
     // Check if Deck exists
     const deck = await this.deckService.findOne(deckId);
@@ -63,6 +58,7 @@ export class CardController {
       id: card.id,
       word: card.word,
       translation: card.translation,
+      phonetic: card.phonetic,
       audioLink: card.audioLink,
       definitions: card.definitions,
       examples: card.examples,
