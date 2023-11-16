@@ -23,14 +23,13 @@ export class CardController {
 
   @Get()
   async findAll() {
-    // return this.cardService.findAll();
-    const WORD = 'intrigued'
+    const WORD = ''
 
     const translatorResult = await this.translatorService.translate(WORD, Language.en, Language.de);
     const lexicalInfoResult = await this.lexicalInfoService.getInfo(WORD);
 
     console.log(translatorResult.data);
-    return lexicalInfoResult.data;
+    return lexicalInfoResult.error;
   }
 
   @Get(':id')
