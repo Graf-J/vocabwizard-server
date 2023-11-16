@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, ForbiddenException, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, ForbiddenException, Put, BadRequestException, NotFoundException } from '@nestjs/common';
 import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Role } from 'src/user/roles.enum';
+import { isValidObjectId } from 'mongoose';
 
 @UseGuards(AuthGuard)
 @Controller('deck')
@@ -30,7 +31,14 @@ export class DeckController {
 
   @Get(':id')
   async findOne(@Req() request, @Param('id') id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException(`Id '${ id }' is not valid`);
+    }
+
     const deck = await this.deckService.findOne(id);
+    if (!deck) {
+      throw new NotFoundException(`Deck with Id '${ id }' not found`);
+    }
 
     if (!(deck.creator.toString() === request.user.id || request.user.role === Role.administrator)) {
       throw new ForbiddenException("You are only allowed to view your own decks");
@@ -47,7 +55,14 @@ export class DeckController {
 
   @Put(':id')
   async update(@Req() request, @Param('id') id: string, @Body() updateDeckDto: UpdateDeckDto) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException(`Id '${ id }' is not valid`);
+    }
+
     const deck = await this.deckService.findOne(id);
+    if (!deck) {
+      throw new NotFoundException(`Deck with Id '${ id }' not found`);
+    }
 
     if (!(deck.creator.toString() === request.user.id || request.user.role === Role.administrator)) {
       throw new ForbiddenException("You are only allowed to update your own decks");
@@ -58,7 +73,14 @@ export class DeckController {
 
   @Delete(':id')
   async remove(@Req() request, @Param('id') id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException(`Id '${ id }' is not valid`);
+    }
+
     const deck = await this.deckService.findOne(id);
+    if (!deck) {
+      throw new NotFoundException(`Deck with Id '${ id }' not found`);
+    }
 
     if (!(deck.creator.toString() === request.user.id || request.user.role === Role.administrator)) {
       throw new ForbiddenException("You are only allowed to delete your own decks");

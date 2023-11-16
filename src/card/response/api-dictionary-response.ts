@@ -1,23 +1,23 @@
-interface License {
+export interface License {
     name: string;
     url: string;
 }
 
-interface Phonetic {
+export interface Phonetic {
     audio: string;
     text: string;
     sourceUrl: string;
     license: License;
 }
 
-interface Definition {
+export interface Definition {
     definition: string;
     synonyms: string[];
     antonyms: string[];
     example?: string;
 }
 
-interface Meaning {
+export interface Meaning {
     partOfSpeech: string;
     definitions: Definition[];
     synonyms: string[];
@@ -26,6 +26,7 @@ interface Meaning {
 
 export default interface ApiDictionaryResponse {
     word: string;
+    phonetic?: string;
     phonetics: Phonetic[];
     meanings: Meaning[];
     license: License;

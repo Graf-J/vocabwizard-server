@@ -19,12 +19,13 @@ export class LexicalInfoService {
     async getInfo(word: string) {
         // return await lastValueFrom(this.httpService.get<ApiDictionaryResponse>(`${ this.dictionaryApiUrl }/api/v2/entries/en/${ word }`));
         const url = `${ this.dictionaryApiUrl }/api/v2/entries/en/${ word }`;
-        const response = await lastValueFrom(this.httpService.post<ApiDictionaryResponse>(url)
+        const response = await lastValueFrom(this.httpService.get<ApiDictionaryResponse[]>(url)
             .pipe(
-                map(res => new ApiResponse<ApiDictionaryResponse>(false, res.data)),
+                map(res => new ApiResponse<ApiDictionaryResponse[]>(false, res.data)),
                 catchError(error => {
+                    console.log(error.message)
                     Logger.error(`External Request to ${ url } failed`, error);
-                    return [new ApiResponse<ApiDictionaryResponse>(true)];
+                    return [new ApiResponse<ApiDictionaryResponse[]>(true)];
                 })
             ));
 

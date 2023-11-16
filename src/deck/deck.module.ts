@@ -8,5 +8,6 @@ import { Deck, DeckSchema } from './deck.schema';
   imports: [MongooseModule.forFeature([{ name: Deck.name, schema: DeckSchema }])],
   controllers: [DeckController],
   providers: [DeckService],
+  exports: [DeckService]
 })
 export class DeckModule {}
