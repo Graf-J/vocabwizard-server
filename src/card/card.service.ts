@@ -1,7 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
-import { UpdateCardDto } from './dto/update-card.dto';
-import { Deck, DeckDocument } from 'src/deck/deck.schema';
+import { DeckDocument } from 'src/deck/deck.schema';
 import { Language } from 'src/deck/languages.enum';
 import { TranslatorService } from './translator.service';
 import { LexicalInfoService } from './lexical-info.service';
@@ -127,6 +126,10 @@ export class CardService {
 
   async findAll(deckId: string) {
     return await this.cardModel.find({ deck: deckId });
+  }
+
+  async findOne(id: string) {
+    return await this.cardModel.findById(id);
   }
 
   async remove(id: string) {

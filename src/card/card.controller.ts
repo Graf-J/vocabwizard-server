@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, BadRequestException, NotFoundException, ForbiddenException, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, BadRequestException, NotFoundException, ForbiddenException, Req, Patch } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { isValidObjectId } from 'mongoose';
 import { DeckService } from 'src/deck/deck.service';
 import { Role } from 'src/user/roles.enum';
+import { UpdateConfidenceDto } from './dto/update-confidence.dto';
 
 @UseGuards(AuthGuard)
 @Controller('deck/:deckId/card')
@@ -91,5 +92,34 @@ export class CardController {
     }
 
     await this.cardService.remove(cardId);
+  }
+
+  @Patch(':cardId/confidence')
+  async updateConfidence(@Req() request, @Param('deckId') deckId: string, @Param('cardId') cardId: string, @Body() updateConfidenceDto: UpdateConfidenceDto) {
+    // Check if IDs are valid
+    if (!isValidObjectId(deckId)) {
+      throw new BadRequestException(`Id '${ deckId }' is not valid`);
+    }
+    if (!isValidObjectId(cardId)) {
+      throw new BadRequestException(`Id '${ cardId }' is not valid`);
+    }
+    // Check if Deck and Card exists
+    const [deck, card] = await Promise.all([
+      this.deckService.findOne(deckId),
+      this.cardService.findOne(cardId)
+    ]);
+    if (!deck) {
+      throw new NotFoundException(`Deck with Id '${ deckId }' not found`);
+    }
+    if (!card) {
+      throw new NotFoundException(`Card with Id '${ cardId }' not found`);
+    }
+
+    // Check if User is allowed to view Cards of Deck
+    if (!(deck.creator.toString() === request.user.id || request.user.role === Role.administrator)) {
+      throw new ForbiddenException("You are only allowed to update a card of you own deck");
+    }
+
+    return updateConfidenceDto;
   }
 }
