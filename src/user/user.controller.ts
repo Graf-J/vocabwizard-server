@@ -4,9 +4,9 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RequiredRole } from 'src/auth/decorator/required-role.decorator';
 import { Role } from './roles.enum';
 import { RoleGuard } from 'src/auth/guard/role.guard';
-import { isValidObjectId } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -23,21 +23,14 @@ export class UserController {
   }
 
   @Delete(':id')
-  async remove(@Req() request, @Param('id') id: string) {
+  async remove(@Req() request, @Param('id', ObjectIdValidationPipe) id: string) {
     if (request.user.id === id) {
       throw new ConflictException('You are not allowed to delete yourself')
     }
-    
-    if (!isValidObjectId(id)) {
-      throw new ConflictException('Invalid User-Id');
-    }
 
-    // TODO: Throw Exception in Method
-    const user = await this.userService.findOne(id);
-    if (!user) {
-      throw new NotFoundException(`User with Id ${ id } not found`)
-    }
-
+    // Throws Exception if User not found
+    await this.userService.findOne(id);
+    // Delete User with all associated Decks and Cards
     await this.userService.remove(id);
   }
 }

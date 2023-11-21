@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { DeckDocument } from 'src/deck/deck.schema';
 import { Language } from 'src/deck/languages.enum';
@@ -159,7 +159,13 @@ export class CardService {
   }
 
   async findOne(id: string) {
-    return await this.cardModel.findById(id);
+    const card = await this.cardModel.findById(id);
+
+    if (!card) {
+      throw new NotFoundException(`Card not found`);
+    }
+
+    return card;
   }
 
   async remove(id: string) {

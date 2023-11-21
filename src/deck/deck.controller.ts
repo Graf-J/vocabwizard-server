@@ -1,12 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, ForbiddenException, Put, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Put } from '@nestjs/common';
 import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { Role } from 'src/user/roles.enum';
-import { isValidObjectId } from 'mongoose';
 import { DeckDto } from './dto/deck.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
+import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
 
 @ApiTags('Deck')
 @ApiBearerAuth()
@@ -27,58 +27,22 @@ export class DeckController {
     return decks.map(deck => new DeckDto(deck));
   }
 
-  @Get(':id')
-  async findOne(@Req() request, @Param('id') id: string) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Id '${ id }' is not valid`);
-    }
-
-    const deck = await this.deckService.findOne(id);
-    if (!deck) {
-      throw new NotFoundException(`Deck with Id '${ id }' not found`);
-    }
-
-    if (!(deck.creator.toString() === request.user.id || request.user.role === Role.administrator)) {
-      throw new ForbiddenException("You are only allowed to view your own decks");
-    }
-
-    return new DeckDto(deck);
+  @UseGuards(OwnDeckOrAdminGuard)
+  @Get(':deckId')
+  async findOne(@Req() request, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
+    return new DeckDto(request.deck);
   }
 
-  @Put(':id')
-  async update(@Req() request, @Param('id') id: string, @Body() updateDeckDto: UpdateDeckDto) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Id '${ id }' is not valid`);
-    }
-
-    const deck = await this.deckService.findOne(id);
-    if (!deck) {
-      throw new NotFoundException(`Deck with Id '${ id }' not found`);
-    }
-
-    if (!(deck.creator.toString() === request.user.id || request.user.role === Role.administrator)) {
-      throw new ForbiddenException("You are only allowed to update your own decks");
-    }
-
-    const updatedDeck =  await this.deckService.update(id, updateDeckDto, deck.creator.toString());
+  @UseGuards(OwnDeckOrAdminGuard)
+  @Put(':deckId')
+  async update(@Req() request, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() updateDeckDto: UpdateDeckDto) {
+    const updatedDeck =  await this.deckService.update(deckId, updateDeckDto, request.deck.creator.toString());
     return new DeckDto(updatedDeck);
   }
 
-  @Delete(':id')
-  async remove(@Req() request, @Param('id') id: string) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Id '${ id }' is not valid`);
-    }
-
-    const deck = await this.deckService.findOne(id);
-    if (!deck) {
-      throw new NotFoundException(`Deck with Id '${ id }' not found`);
-    }
-
-    if (!(deck.creator.toString() === request.user.id || request.user.role === Role.administrator)) {
-      throw new ForbiddenException("You are only allowed to delete your own decks");
-    }
-
-    await this.deckService.remove(id);
+  @UseGuards(OwnDeckOrAdminGuard)
+  @Delete(':deckId')
+  async remove(@Param('deckId', ObjectIdValidationPipe) deckId: string) {
+    await this.deckService.remove(deckId);
   }
 }

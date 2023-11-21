@@ -20,13 +20,8 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException('Username or Password is not valid');
     }
-
-    // Check if Password is valid
-    const isPasswordValid = await this.authService.validatePassword(loginUserDto.password, user.passwordHash);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Username or Password is not valid');
-    }
-
+    // Validate Password
+    await this.authService.validatePassword(loginUserDto.password, user.passwordHash);
     // Generate and return JsonWebToken
     const jwt = await this.authService.generateJWT(user.id, user.role);
     return { 'AccessToken': jwt };

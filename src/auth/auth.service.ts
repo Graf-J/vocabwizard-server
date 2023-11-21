@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from 'src/user/roles.enum';
 import * as bcrypt from 'bcrypt';
@@ -12,6 +12,10 @@ export class AuthService {
   }
 
   async validatePassword(password: string, passwordHash: string) {
-    return await bcrypt.compare(password, passwordHash);
+    const isPasswordValid = await bcrypt.compare(password, passwordHash);
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Username or Password is not valid');
+    }
   }
 }
