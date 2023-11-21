@@ -17,7 +17,6 @@ export class LexicalInfoService {
     }
 
     async getInfo(word: string) {
-        // return await lastValueFrom(this.httpService.get<ApiDictionaryResponse>(`${ this.dictionaryApiUrl }/api/v2/entries/en/${ word }`));
         const url = `${ this.dictionaryApiUrl }/api/v2/entries/en/${ word }`;
         const response = await lastValueFrom(this.httpService.get<ApiDictionaryResponse[]>(url)
             .pipe(

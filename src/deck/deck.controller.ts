@@ -68,6 +68,7 @@ export class DeckController {
       throw new ForbiddenException("You are only allowed to update your own decks");
     }
 
+    // TODO: Filter with Deck Dto
     return await this.deckService.update(id, updateDeckDto, deck.creator.toString());
   }
 

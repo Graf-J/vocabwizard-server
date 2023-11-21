@@ -128,6 +128,36 @@ export class CardService {
     return await this.cardModel.find({ deck: deckId });
   }
 
+  async findCardsToLearn(deckId: string, learningRate: number) {
+    const currentDate = new Date();
+
+    // Queries
+    const newCardsQuery = {
+      deck: deckId,
+      expires: null,
+    };
+    const oldCardsQuery = {
+      deck: deckId,
+      expires: { $lt: currentDate },
+    };
+
+    // Options
+    const newCardsOptions = {
+      sort: { createdAt: 1 },
+      limit: learningRate,
+    };
+    const oldCardsOptions = {
+      sort: { expires: 1 },
+    }
+
+    const [newCards, oldCards] = await Promise.all([
+      this.cardModel.find(newCardsQuery, null, newCardsOptions),
+      this.cardModel.find(oldCardsQuery, null, oldCardsOptions)
+    ]);
+
+    return newCards.concat(oldCards);
+  }
+
   async findOne(id: string) {
     return await this.cardModel.findById(id);
   }
@@ -138,5 +168,63 @@ export class CardService {
 
   async removeCardsFromDecks(deckIds: string[]) {
     await this.cardModel.deleteMany({ deck: { $in: deckIds } });
+  }
+
+  async updateCardRepeat(card: CardDocument) {
+    const stage = 0;
+    
+    await this.updateCard(card.id, stage);
+  }
+
+  async updateCardHard(card: CardDocument) {
+    let stage: number;
+    if (card.stage <= 2) {
+      stage = 0;
+    } else if (card.stage <= 4) {
+      stage = 1;
+    } else if (card.stage <= 6) {
+      stage = 2;
+    } else {
+      stage = 3;
+    }
+
+    await this.updateCard(card.id, stage);
+  }
+
+  async updateCardGood(card: CardDocument) {
+    let stage = card.stage;
+    if (stage < 8) {
+      stage++;
+    }
+
+    await this.updateCard(card.id, stage);
+  }
+
+  async updateCardEasy(card: CardDocument) {
+    let stage: number;
+    if (card.stage <= 6) {
+      stage = card.stage += 2;
+    } else {
+      stage = 8;
+    }
+
+    await this.updateCard(card.id, stage);
+  }
+
+  private async updateCard(cardId: string, stage: number) {
+    await this.cardModel.updateOne({ _id: cardId }, { $set: {
+      stage: stage,
+      expires: this.convertStageToDate(stage)
+    } });
+  }
+
+  // expiresDate is in 2^stage days at midnight
+  private convertStageToDate(stage: number) {
+    const currentDate = new Date();
+    const expiresDate = new Date()
+    expiresDate.setDate(currentDate.getDate() + Math.pow(2, stage));
+    expiresDate.setHours(0, 0, 0, 0)
+
+    return expiresDate;
   }
 }

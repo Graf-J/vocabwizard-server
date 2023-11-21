@@ -1,6 +1,6 @@
 export enum Confidence {
-    bad = 'bad',
-    ok = 'ok',
+    repeat = 'repeat',
+    hard = 'hard',
     good = 'good',
-    excellent = 'excellent'
+    easy = 'easy'
 }

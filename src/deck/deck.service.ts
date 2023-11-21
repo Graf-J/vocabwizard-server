@@ -36,7 +36,8 @@ export class DeckService {
     return await this.deckModel.find({ creator: userId }).sort({ 'createdAt': 'asc' });
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<DeckDocument> {
+    // TODO: Throw Exception if not found
     return await this.deckModel.findById(id);
   }
 
@@ -45,7 +46,7 @@ export class DeckService {
       name: updateDeckDto.name,
       creator: creatorId
     })
-    if (duplicate) {
+    if (duplicate && duplicate.id !== id) {
       throw new ConflictException(`The Deck ${ updateDeckDto.name } already exists`);
     }
 
