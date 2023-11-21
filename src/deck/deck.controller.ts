@@ -5,7 +5,10 @@ import { UpdateDeckDto } from './dto/update-deck.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Role } from 'src/user/roles.enum';
 import { isValidObjectId } from 'mongoose';
+import { DeckDto } from './dto/deck.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Deck')
 @UseGuards(AuthGuard)
 @Controller('deck')
 export class DeckController {
@@ -20,13 +23,7 @@ export class DeckController {
   @Get()
   async findAll(@Req() request) {
     const decks = await this.deckService.findAll(request.user.id);
-    return decks.map(deck => ({
-      id: deck.id,
-      name: deck.name,
-      learningRate: deck.learningRate,
-      fromLang: deck.fromLang,
-      toLang: deck.toLang
-    }))
+    return decks.map(deck => new DeckDto(deck));
   }
 
   @Get(':id')
@@ -44,13 +41,7 @@ export class DeckController {
       throw new ForbiddenException("You are only allowed to view your own decks");
     }
 
-    return {
-      id: deck.id,
-      name: deck.name,
-      learningRate: deck.learningRate,
-      fromLang: deck.fromLang,
-      toLang: deck.toLang
-    }
+    return new DeckDto(deck);
   }
 
   @Put(':id')
@@ -68,8 +59,8 @@ export class DeckController {
       throw new ForbiddenException("You are only allowed to update your own decks");
     }
 
-    // TODO: Filter with Deck Dto
-    return await this.deckService.update(id, updateDeckDto, deck.creator.toString());
+    const updatedDeck =  await this.deckService.update(id, updateDeckDto, deck.creator.toString());
+    return new DeckDto(updatedDeck);
   }
 
   @Delete(':id')

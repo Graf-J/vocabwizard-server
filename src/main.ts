@@ -3,6 +3,10 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import 'dotenv/config';
+import { CardDto } from './card/dto/card.dto';
+import { DeckDto } from './deck/dto/deck.dto';
+import { UserDto } from './user/dto/user.dto';
+import { AuthResponseDto } from './auth/dto/auth-response.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,12 +16,13 @@ async function bootstrap() {
 
   // Add Swagger
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('Vocab-Wizard-Server')
+    .setDescription('This is the Swagger API of the Vocab-Wizard-Server')
     .setVersion('1.0')
-    .addTag('cats')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [CardDto, DeckDto, UserDto, AuthResponseDto]
+  });
   SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);

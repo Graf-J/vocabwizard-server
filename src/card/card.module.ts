@@ -4,8 +4,7 @@ import { TranslatorService } from './translator.service';
 import { LexicalInfoService } from './lexical-info.service';
 import { HttpModule } from '@nestjs/axios';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Card } from './entities/card.entity';
-import { CardSchema } from './card.schema';
+import { Card, CardSchema } from './card.schema';
 import { DeckModule } from 'src/deck/deck.module';
 import { CardController } from './card.controller';
 

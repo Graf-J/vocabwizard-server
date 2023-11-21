@@ -44,6 +44,9 @@ export class UserService {
   }
 
   async remove(id: string) {
-    await this.deckService.removeDecksFromUser(id);
+    await Promise.all([
+      this.userModel.deleteOne({ _id: id }),
+      this.deckService.removeDecksFromUser(id)
+    ]);
   }
 }

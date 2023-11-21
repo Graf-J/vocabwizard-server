@@ -5,7 +5,10 @@ import { RequiredRole } from 'src/auth/decorator/required-role.decorator';
 import { Role } from './roles.enum';
 import { RoleGuard } from 'src/auth/guard/role.guard';
 import { isValidObjectId } from 'mongoose';
+import { UserDto } from './dto/user.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('User')
 @UseGuards(AuthGuard, RoleGuard)
 @RequiredRole(Role.administrator)
 @Controller('user')
@@ -15,15 +18,7 @@ export class UserController {
   @Get()
   async findAll() {
     const users = await this.userService.findAll();
-
-    return users.map(mongoUser => {
-      return {
-        id: mongoUser.id,
-        name: mongoUser.name,
-        role: mongoUser.role,
-        createdAt: mongoUser.createdAt,
-      };
-    });
+    return users.map(user => new UserDto(user));
   }
 
   @Delete(':id')
@@ -36,11 +31,12 @@ export class UserController {
       throw new ConflictException('Invalid User-Id');
     }
 
+    // TODO: Throw Exception in Method
     const user = await this.userService.findOne(id);
     if (!user) {
       throw new NotFoundException(`User with Id ${ id } not found`)
     }
 
-    return this.userService.remove(id);
+    await this.userService.remove(id);
   }
 }

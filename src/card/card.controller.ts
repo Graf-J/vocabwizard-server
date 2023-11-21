@@ -7,7 +7,10 @@ import { DeckService } from 'src/deck/deck.service';
 import { Role } from 'src/user/roles.enum';
 import { UpdateConfidenceDto } from './dto/update-confidence.dto';
 import { Confidence } from './confidence.enum';
+import { CardDto } from './dto/card.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Card')
 @UseGuards(AuthGuard)
 @Controller('deck/:deckId/card')
 export class CardController {
@@ -56,21 +59,7 @@ export class CardController {
     }
 
     const cards = await this.cardService.findAll(deckId);
-    // TODO: Create DTO Class and Filter the properties there
-    return cards.map(card => ({
-      id: card.id,
-      word: card.word,
-      translation: card.translation,
-      phonetic: card.phonetic,
-      audioLink: card.audioLink,
-      definitions: card.definitions,
-      examples: card.examples,
-      synonyms: card.synonyms,
-      antonyms: card.antonyms,
-      stage: card.stage,
-      expires: card.expires,
-      createdAt: card.createdAt
-    }))
+    return cards.map(card => new CardDto(card));
   }
 
   @Get('learn')
@@ -90,12 +79,7 @@ export class CardController {
     }
 
     const cards = await this.cardService.findCardsToLearn(deck.id, deck.learningRate);
-    return cards.map(card => ({
-      id: card.id,
-      word: card.word,
-      expires: card.expires,
-      createdAt: card.createdAt
-    }))
+    return cards.map(card => new CardDto(card));
   }
 
   @Delete(':cardId')
@@ -112,6 +96,7 @@ export class CardController {
     if (!deck) {
       throw new NotFoundException(`Deck with Id '${ deckId }' not found`);
     }
+    // TODO: Get Card and check if it belongs to deck like below
 
     // Check if User is allowed to view Cards of Deck
     if (!(deck.creator.toString() === request.user.id || request.user.role === Role.administrator)) {
