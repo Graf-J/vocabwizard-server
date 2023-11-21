@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, BadRequestException, NotFoundException, ForbiddenException, Req, Patch, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Patch, ConflictException } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { DeckService } from 'src/deck/deck.service';
-import { Role } from 'src/user/roles.enum';
 import { UpdateConfidenceDto } from './dto/update-confidence.dto';
 import { Confidence } from './confidence.enum';
 import { CardDto } from './dto/card.dto';

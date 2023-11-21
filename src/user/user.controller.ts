@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete, UseGuards, Req, ConflictException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Delete, UseGuards, Req, ConflictException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RequiredRole } from 'src/auth/decorator/required-role.decorator';

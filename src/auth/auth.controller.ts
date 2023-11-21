@@ -1,4 +1,4 @@
-import { Controller, Post, Body, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
