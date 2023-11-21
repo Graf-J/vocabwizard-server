@@ -6,9 +6,10 @@ import { Role } from './roles.enum';
 import { RoleGuard } from 'src/auth/guard/role.guard';
 import { isValidObjectId } from 'mongoose';
 import { UserDto } from './dto/user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('User')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RoleGuard)
 @RequiredRole(Role.administrator)
 @Controller('user')

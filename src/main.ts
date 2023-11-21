@@ -19,6 +19,7 @@ async function bootstrap() {
     .setTitle('Vocab-Wizard-Server')
     .setDescription('This is the Swagger API of the Vocab-Wizard-Server')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config, {
     extraModels: [CardDto, DeckDto, UserDto, AuthResponseDto]

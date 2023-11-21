@@ -8,9 +8,10 @@ import { Role } from 'src/user/roles.enum';
 import { UpdateConfidenceDto } from './dto/update-confidence.dto';
 import { Confidence } from './confidence.enum';
 import { CardDto } from './dto/card.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Card')
+@ApiBearerAuth()
 @UseGuards(AuthGuard)
 @Controller('deck/:deckId/card')
 export class CardController {

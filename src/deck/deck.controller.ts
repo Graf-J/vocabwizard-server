@@ -6,9 +6,10 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Role } from 'src/user/roles.enum';
 import { isValidObjectId } from 'mongoose';
 import { DeckDto } from './dto/deck.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Deck')
+@ApiBearerAuth()
 @UseGuards(AuthGuard)
 @Controller('deck')
 export class DeckController {
