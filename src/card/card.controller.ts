@@ -14,7 +14,7 @@ import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
 @ApiBearerAuth()
 @UseGuards(OwnDeckOrAdminGuard)
 @UseGuards(AuthGuard)
-@Controller('deck/:deckId/card')
+@Controller('decks/:deckId/cards')
 export class CardController {
   constructor(
     private readonly cardService: CardService,

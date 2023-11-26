@@ -12,7 +12,7 @@ import { DeckDto } from './dto/deck.dto';
 @ApiTags('Deck')
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
-@Controller('deck')
+@Controller('decks')
 export class DeckController {
   constructor(private readonly deckService: DeckService) {}
 

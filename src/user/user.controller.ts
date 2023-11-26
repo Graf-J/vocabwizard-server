@@ -12,7 +12,7 @@ import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
 @ApiBearerAuth()
 @UseGuards(AuthGuard, RoleGuard)
 @RequiredRole(Role.administrator)
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
