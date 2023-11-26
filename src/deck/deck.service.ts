@@ -3,7 +3,7 @@ import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Deck, DeckDocument } from './deck.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { CardService } from 'src/card/card.service';
 
 @Injectable()
@@ -33,7 +33,56 @@ export class DeckService {
   }
 
   async findAll(userId: string) {
-    return await this.deckModel.find({ creator: userId }).sort({ 'createdAt': 'asc' });
+    const currentDate = new Date();
+    // Joins New Cards with the Decks (cards where expires = null)
+    const lookupNewCards = {
+      $lookup: {
+        from: 'cards',
+        localField: '_id',
+        foreignField: 'deck',
+        as: 'newCards',
+        pipeline: [
+          {
+            $match: { expires: null }
+          }
+        ]
+      }
+    }
+    // Joins Old Cards with the Decks (cards where expires < Date.now)
+    const lookupOldCards = {
+      $lookup: {
+        from: 'cards',
+        localField: '_id',
+        foreignField: 'deck',
+        as: 'oldCards',
+        pipeline: [
+          { $match: { expires: { $lt: currentDate } } }
+        ]
+      }
+    }
+    // Aggregates old and new cards into a count variable
+    const countCards = { 
+      $addFields: {
+        newCardCount: { $size: '$newCards' },
+        oldCardCount: { $size: '$oldCards' },
+      }
+    }
+    // Excludes newCards and oldCards to save bandwidth
+    const projection = {
+      $project: {
+        newCards: 0,
+        oldCards: 0
+      }
+    }
+    // Execute statements and return result
+    return await this.deckModel.aggregate([
+      { $match: { creator: new mongoose.Types.ObjectId(userId) } },
+      lookupNewCards,
+      lookupOldCards,
+      countCards,
+      projection,
+      { $sort: { createdAt: 1 } }
+    ])
   }
 
   async findOne(id: string): Promise<DeckDocument> {

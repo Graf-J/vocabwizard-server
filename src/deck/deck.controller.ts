@@ -3,10 +3,11 @@ import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { DeckDto } from './dto/deck.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
 import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
+import { DecksDto } from './dto/decks.dto';
+import { DeckDto } from './dto/deck.dto';
 
 @ApiTags('Deck')
 @ApiBearerAuth()
@@ -24,7 +25,7 @@ export class DeckController {
   @Get()
   async findAll(@Req() request) {
     const decks = await this.deckService.findAll(request.user.id);
-    return decks.map(deck => new DeckDto(deck));
+    return decks.map(deck => new DecksDto(deck));
   }
 
   @UseGuards(OwnDeckOrAdminGuard)

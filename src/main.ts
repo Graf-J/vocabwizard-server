@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import 'dotenv/config';
 import { CardDto } from './card/dto/card.dto';
 import { DeckDto } from './deck/dto/deck.dto';
+import { DecksDto } from './deck/dto/decks.dto';
 import { UserDto } from './user/dto/user.dto';
 import { AuthResponseDto } from './auth/dto/auth-response.dto';
 
@@ -22,7 +23,7 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config, {
-    extraModels: [CardDto, DeckDto, UserDto, AuthResponseDto]
+    extraModels: [CardDto, DeckDto, DecksDto, UserDto, AuthResponseDto]
   });
   SwaggerModule.setup('api', app, document);
 
