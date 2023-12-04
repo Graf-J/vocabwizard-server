@@ -8,6 +8,8 @@ import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
 import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
 import { DecksDto } from './dto/decks.dto';
 import { DeckDto } from './dto/deck.dto';
+import { AuthGuardRequest } from 'src/util/request/auth-guard.request';
+import { OwnDeckOrAdminRequest } from 'src/util/request/own-deck-or-admin.request';
 
 @ApiTags('Deck')
 @ApiBearerAuth()
@@ -17,26 +19,26 @@ export class DeckController {
   constructor(private readonly deckService: DeckService) {}
 
   @Post()
-  async create(@Req() request, @Body() createDeckDto: CreateDeckDto) {
+  async create(@Req() request: AuthGuardRequest, @Body() createDeckDto: CreateDeckDto) {
     const deck = await this.deckService.create(createDeckDto, request.user.id);
     return { 'id': deck.id };
   }
 
   @Get()
-  async findAll(@Req() request) {
+  async findAll(@Req() request: AuthGuardRequest) {
     const decks = await this.deckService.findAll(request.user.id);
     return decks.map(deck => new DecksDto(deck));
   }
 
   @UseGuards(OwnDeckOrAdminGuard)
   @Get(':deckId')
-  async findOne(@Req() request, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
+  async findOne(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
     return new DeckDto(request.deck);
   }
 
   @UseGuards(OwnDeckOrAdminGuard)
   @Put(':deckId')
-  async update(@Req() request, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() updateDeckDto: UpdateDeckDto) {
+  async update(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() updateDeckDto: UpdateDeckDto) {
     const updatedDeck =  await this.deckService.update(deckId, updateDeckDto, request.deck.creator.toString());
     return new DeckDto(updatedDeck);
   }

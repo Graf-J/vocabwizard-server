@@ -7,6 +7,7 @@ import { RoleGuard } from 'src/auth/guard/role.guard';
 import { UserDto } from './dto/user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
+import { AuthGuardRequest } from 'src/util/request/auth-guard.request';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -23,7 +24,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  async remove(@Req() request, @Param('id', ObjectIdValidationPipe) id: string) {
+  async remove(@Req() request: AuthGuardRequest, @Param('id', ObjectIdValidationPipe) id: string) {
     if (request.user.id === id) {
       throw new ConflictException('You are not allowed to delete yourself')
     }

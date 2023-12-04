@@ -2,13 +2,13 @@ import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Patch, Conf
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { DeckService } from 'src/deck/deck.service';
 import { UpdateConfidenceDto } from './dto/update-confidence.dto';
 import { Confidence } from './confidence.enum';
 import { CardDto } from './dto/card.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
 import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
+import { OwnDeckOrAdminRequest } from 'src/util/request/own-deck-or-admin.request';
 
 @ApiTags('Card')
 @ApiBearerAuth()
@@ -17,30 +17,29 @@ import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
 @Controller('decks/:deckId/cards')
 export class CardController {
   constructor(
-    private readonly cardService: CardService,
-    private readonly deckService: DeckService,
+    private readonly cardService: CardService
   ) {}
 
   @Post()
-  async create(@Req() request, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() createCardDto: CreateCardDto) {
+  async create(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() createCardDto: CreateCardDto) {
     const card =  await this.cardService.create(createCardDto, request.deck);
     return { 'id': card.id };
   }
 
   @Get()
-  async findAll(@Req() request, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
+  async findAll(@Param('deckId', ObjectIdValidationPipe) deckId: string) {
     const cards = await this.cardService.findAll(deckId);
     return cards.map(card => new CardDto(card));
   }
 
   @Get('learn')
-  async findCardsToLearn(@Req() request, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
+  async findCardsToLearn(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
     const cards = await this.cardService.findCardsToLearn(request.deck.id, request.deck.learningRate);
     return cards.map(card => new CardDto(card));
   }
 
   @Delete(':cardId')
-  async remove(@Req() request, @Param('cardId', ObjectIdValidationPipe) cardId: string) {
+  async remove(@Req() request: OwnDeckOrAdminRequest, @Param('cardId', ObjectIdValidationPipe) cardId: string) {
     const card = await this.cardService.findOne(cardId);
     if (card.deck.toString() !== request.deck.id) {
       throw new ConflictException('Card does not belong to Deck');
@@ -50,7 +49,7 @@ export class CardController {
   }
 
   @Patch(':cardId/confidence')
-  async updateConfidence(@Req() request, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Param('cardId', ObjectIdValidationPipe) cardId: string, @Body() updateConfidenceDto: UpdateConfidenceDto) {
+  async updateConfidence(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Param('cardId', ObjectIdValidationPipe) cardId: string, @Body() updateConfidenceDto: UpdateConfidenceDto) {
     const card = await this.cardService.findOne(cardId);
     if (card.deck.toString() !== request.deck.id) {
       throw new ConflictException('Card does not belong to Deck');
