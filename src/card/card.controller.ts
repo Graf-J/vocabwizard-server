@@ -49,16 +49,13 @@ export class CardController {
   }
 
   @Patch(':cardId/confidence')
-  async updateConfidence(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Param('cardId', ObjectIdValidationPipe) cardId: string, @Body() updateConfidenceDto: UpdateConfidenceDto) {
+  async updateConfidence(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) _deckId: string, @Param('cardId', ObjectIdValidationPipe) cardId: string, @Body() updateConfidenceDto: UpdateConfidenceDto) {
     const card = await this.cardService.findOne(cardId);
     if (card.deck.toString() !== request.deck.id) {
       throw new ConflictException('Card does not belong to Deck');
     }
 
     switch(updateConfidenceDto.confidence) {
-      case Confidence.repeat:
-        await this.cardService.updateCardRepeat(card);
-        break;
       case Confidence.hard:
         await this.cardService.updateCardHard(card);
         break;

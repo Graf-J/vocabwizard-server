@@ -176,12 +176,6 @@ export class CardService {
     await this.cardModel.deleteMany({ deck: { $in: deckIds } });
   }
 
-  async updateCardRepeat(card: CardDocument) {
-    const stage = 0;
-    
-    await this.updateCard(card.id, stage);
-  }
-
   async updateCardHard(card: CardDocument) {
     let stage: number;
     if (card.stage <= 2) {
