@@ -117,6 +117,20 @@ export class DeckService {
     await this.cardService.copy(cards, newDeck)
   }
 
+  async swap(deckId: string, userId: string) {
+    const deck = await this.findOne(deckId);
+
+    const newDeck = await this.create({
+      name: `${deck.name}-Swap`,
+      learningRate: deck.learningRate,
+      fromLang: deck.toLang,
+      toLang: deck.fromLang
+    }, userId)
+
+    const cards = await this.cardService.findAll(deckId)
+    await this.cardService.copy(cards, newDeck, true)
+  }
+
   async update(id: string, updateDeckDto: UpdateDeckDto, creatorId: string) {
     const duplicate = await this.deckModel.findOne({ 
       name: updateDeckDto.name,

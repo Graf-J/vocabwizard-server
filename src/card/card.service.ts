@@ -47,12 +47,12 @@ export class CardService {
     return await card.save();
   }
 
-  async copy(cards: CardDocument[], deck: Deck) {
+  async copy(cards: CardDocument[], deck: Deck, swap: boolean = false) {
     const currentDate = new Date()
     await Promise.all(cards.map(async (card) => {
       const newCard = new this.cardModel({
-          word: card.word,
-          translation: card.translation,
+          word: swap ? card.translation : card.word,
+          translation: swap ? card.word : card.translation,
           phonetic: card.phonetic,
           audioLink: card.audioLink,
           definitions: card.definitions,

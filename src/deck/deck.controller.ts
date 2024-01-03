@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Put, Patch } from '@nestjs/common';
 import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
@@ -47,6 +47,11 @@ export class DeckController {
   async update(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() updateDeckDto: UpdateDeckDto) {
     const updatedDeck =  await this.deckService.update(deckId, updateDeckDto, request.deck.creator.toString());
     return new DeckDto(updatedDeck);
+  }
+
+  @Patch(':deckId/swap')
+  async swap(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
+    await this.deckService.swap(deckId, request.user.id);
   }
 
   @UseGuards(OwnDeckOrAdminGuard)
