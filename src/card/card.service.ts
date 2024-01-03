@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
-import { DeckDocument } from 'src/deck/deck.schema';
+import { Deck, DeckDocument } from 'src/deck/deck.schema';
 import { Language } from 'src/deck/languages.enum';
 import { TranslatorService } from './translator.service';
 import { LexicalInfoService } from './lexical-info.service';
@@ -45,6 +45,28 @@ export class CardService {
       createdAt: Date.now()
     })
     return await card.save();
+  }
+
+  async copy(cards: CardDocument[], deck: Deck) {
+    const currentDate = new Date()
+    await Promise.all(cards.map(async (card) => {
+      const newCard = new this.cardModel({
+          word: card.word,
+          translation: card.translation,
+          phonetic: card.phonetic,
+          audioLink: card.audioLink,
+          definitions: card.definitions,
+          examples: card.examples,
+          synonyms: card.synonyms,
+          antonyms: card.antonyms,
+          stage: 0,
+          expires: null,
+          deck: deck,
+          createdAt: currentDate
+      })
+
+      await newCard.save();
+    }))
   }
 
   private async getExternalData(word: string, fromLang: Language, toLang: Language) {

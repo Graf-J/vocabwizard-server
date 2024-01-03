@@ -10,6 +10,7 @@ import { DecksDto } from './dto/decks.dto';
 import { DeckDto } from './dto/deck.dto';
 import { AuthGuardRequest } from 'src/util/request/auth-guard.request';
 import { OwnDeckOrAdminRequest } from 'src/util/request/own-deck-or-admin.request';
+import { ImportDeckDto } from './dto/import-deck.dto';
 
 @ApiTags('Deck')
 @ApiBearerAuth()
@@ -22,6 +23,11 @@ export class DeckController {
   async create(@Req() request: AuthGuardRequest, @Body() createDeckDto: CreateDeckDto) {
     const deck = await this.deckService.create(createDeckDto, request.user.id);
     return { 'id': deck.id };
+  }
+
+  @Post('import')
+  async import(@Req() request: AuthGuardRequest, @Body() importDeckDto: ImportDeckDto) {
+    await this.deckService.import(request.user.id, importDeckDto.deckId)
   }
 
   @Get()

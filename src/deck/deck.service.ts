@@ -1,9 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Deck, DeckDocument } from './deck.schema';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, isValidObjectId } from 'mongoose';
 import { CardService } from 'src/card/card.service';
 
 @Injectable()
@@ -93,6 +93,28 @@ export class DeckService {
     }
 
     return deck;
+  }
+
+  async import(userId: string, deckId: string) {
+    if (!isValidObjectId(deckId)) {
+      throw new BadRequestException(`Invalid ObjectId: ${deckId}`);
+    }
+
+    const deck = await this.findOne(deckId);
+
+    if (deck.creator.toString() == userId) {
+      throw new ConflictException('You already own this deck')
+    }
+
+    const newDeck = await this.create({
+      name: deck.name,
+      learningRate: deck.learningRate,
+      fromLang: deck.fromLang,
+      toLang: deck.toLang
+    }, userId)
+
+    const cards = await this.cardService.findAll(deckId)
+    await this.cardService.copy(cards, newDeck)
   }
 
   async update(id: string, updateDeckDto: UpdateDeckDto, creatorId: string) {
