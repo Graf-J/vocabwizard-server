@@ -2,7 +2,7 @@ import { HttpService } from "@nestjs/axios";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { catchError, lastValueFrom, map } from "rxjs";
-import ApiDictionaryResponse from "./response/api-dictionary-response";
+import ApiDictionaryResponse, { Meaning } from "./response/api-dictionary-response";
 import ApiResponse from "./response/api-response";
 
 @Injectable()
@@ -27,6 +27,41 @@ export class LexicalInfoService {
                 })
             ));
 
+        // Remove duplicate Synonyms and Antonyms
+        if (!response.error && response.data) {
+            response.data.forEach(entry => {
+                this.removeDuplicates(entry.meanings);
+            });
+        }
+
         return response;
+    }
+
+    private removeDuplicates(meanings: Meaning[]): void {
+        const allSynonyms: string[] = [];
+        const allAntonyms: string[] = [];
+
+        // Collect all synonyms and antonyms from all meanings
+        meanings.forEach(meaning => {
+            allSynonyms.push(...meaning.synonyms);
+            allAntonyms.push(...meaning.antonyms);
+        });
+
+        // Remove duplicates from the collected arrays
+        const uniqueSynonyms = [...new Set(allSynonyms)];
+        const uniqueAntonyms = [...new Set(allAntonyms)];
+
+        // Apply the unique arrays to first meaning and clear the other meanings
+        let firstIteration = true;
+        meanings.forEach(meaning => {
+            if (firstIteration) {
+                meaning.synonyms = uniqueSynonyms;
+                meaning.antonyms = uniqueAntonyms;
+                firstIteration = false;
+            } else {
+                meaning.synonyms = []
+                meaning.antonyms = []
+            }
+        });
     }
 }
