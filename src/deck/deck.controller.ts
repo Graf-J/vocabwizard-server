@@ -11,6 +11,7 @@ import { DeckDto } from './dto/deck.dto';
 import { AuthGuardRequest } from 'src/util/request/auth-guard.request';
 import { OwnDeckOrAdminRequest } from 'src/util/request/own-deck-or-admin.request';
 import { ImportDeckDto } from './dto/import-deck.dto';
+import { StatDto } from './dto/stat.dto';
 
 @ApiTags('Deck')
 @ApiBearerAuth()
@@ -43,15 +44,23 @@ export class DeckController {
   }
 
   @UseGuards(OwnDeckOrAdminGuard)
+  @Get(':deckId/stats')
+  async stats(@Param('deckId', ObjectIdValidationPipe) deckId: string) {
+    const stats = await this.deckService.stats(deckId)
+    return stats.map(stat => new StatDto(stat))
+  }
+
+  @UseGuards(OwnDeckOrAdminGuard)
   @Put(':deckId')
   async update(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() updateDeckDto: UpdateDeckDto) {
     const updatedDeck =  await this.deckService.update(deckId, updateDeckDto, request.deck.creator.toString());
     return new DeckDto(updatedDeck);
   }
 
+  @UseGuards(OwnDeckOrAdminGuard)
   @Patch(':deckId/swap')
   async swap(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
-    await this.deckService.swap(deckId, request.user.id);
+    await this.deckService.swap(request.deck, request.user.id);
   }
 
   @UseGuards(OwnDeckOrAdminGuard)

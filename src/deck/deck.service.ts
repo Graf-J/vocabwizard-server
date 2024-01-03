@@ -3,7 +3,7 @@ import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Deck, DeckDocument } from './deck.schema';
-import mongoose, { Model, isValidObjectId } from 'mongoose';
+import mongoose, { Model, Types, isValidObjectId } from 'mongoose';
 import { CardService } from 'src/card/card.service';
 
 @Injectable()
@@ -117,9 +117,7 @@ export class DeckService {
     await this.cardService.copy(cards, newDeck)
   }
 
-  async swap(deckId: string, userId: string) {
-    const deck = await this.findOne(deckId);
-
+  async swap(deck: DeckDocument, userId: string) {
     const newDeck = await this.create({
       name: `${deck.name}-Swap`,
       learningRate: deck.learningRate,
@@ -127,7 +125,7 @@ export class DeckService {
       toLang: deck.fromLang
     }, userId)
 
-    const cards = await this.cardService.findAll(deckId)
+    const cards = await this.cardService.findAll(deck.id)
     await this.cardService.copy(cards, newDeck, true)
   }
 
@@ -145,6 +143,36 @@ export class DeckService {
       { $set: updateDeckDto },
       { new: true }
     )
+  }
+
+  async stats(id: string) {
+    const deckObjectId = new Types.ObjectId(id);
+
+    // Gets Cards from Deck with id and counts the groups by stage 
+    return await this.deckModel.aggregate([
+      {
+        $match: {
+          _id: deckObjectId
+        }
+      },
+      {
+        $lookup: {
+          from: 'cards',
+          localField: '_id',
+          foreignField: 'deck',
+          as: 'cards',
+        },
+      },
+      {
+        $unwind: '$cards',
+      },
+      {
+        $group: {
+          _id: '$cards.stage',
+          count: { $sum: 1 },
+        },
+      }
+    ])
   }
 
   async remove(id: string) {

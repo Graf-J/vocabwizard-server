@@ -8,6 +8,8 @@ import { DeckDto } from './deck/dto/deck.dto';
 import { DecksDto } from './deck/dto/decks.dto';
 import { UserDto } from './user/dto/user.dto';
 import { AuthResponseDto } from './auth/dto/auth-response.dto';
+import { ImportDeckDto } from './deck/dto/import-deck.dto';
+import { StatDto } from './deck/dto/stat.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,7 +25,7 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config, {
-    extraModels: [CardDto, DeckDto, DecksDto, UserDto, AuthResponseDto]
+    extraModels: [CardDto, DeckDto, DecksDto, UserDto, AuthResponseDto, ImportDeckDto, StatDto]
   });
   SwaggerModule.setup('api', app, document);
 
