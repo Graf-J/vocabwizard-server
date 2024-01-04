@@ -75,7 +75,7 @@ export class DeckService {
       }
     }
     // Execute statements and return result
-    return await this.deckModel.aggregate([
+    const decks = await this.deckModel.aggregate([
       { $match: { creator: new mongoose.Types.ObjectId(userId) } },
       lookupNewCards,
       lookupOldCards,
@@ -83,6 +83,8 @@ export class DeckService {
       projection,
       { $sort: { createdAt: 1 } }
     ])
+
+    return decks.map(deck => ({ ...deck, newCardCount: this.calculateNewCardsAmount(deck) }));
   }
 
   async findOne(id: string): Promise<DeckDocument> {
@@ -119,7 +121,7 @@ export class DeckService {
 
   async swap(deck: DeckDocument, userId: string) {
     const newDeck = await this.create({
-      name: `${deck.name}-Swap`,
+      name: `${deck.name}-Reversed`,
       learningRate: deck.learningRate,
       fromLang: deck.toLang,
       toLang: deck.fromLang
@@ -143,6 +145,33 @@ export class DeckService {
       { $set: updateDeckDto },
       { new: true }
     )
+  }
+
+  async incrementTodayLearnedCards(deck: DeckDocument) {
+    const currentDate = new Date()
+    currentDate.setHours(0, 0, 0, 0)
+
+    // Update amount of cards learned today and update date in neccessary
+    if (!deck.lastTimeLearned || deck.lastTimeLearned.getTime() !== currentDate.getTime()) {
+      await this.deckModel.findByIdAndUpdate(
+        { _id: deck.id },
+        {
+          $set: {
+            lastTimeLearned: currentDate,
+            numCardsLearned: 1
+          }
+        },
+        { new: true }
+      )
+    } else {
+      await this.deckModel.findOneAndUpdate(
+        { _id: deck.id },
+        {
+          $inc: { numCardsLearned: 1 }
+        },
+        { new: true }
+      )
+    }
   }
 
   async stats(id: string) {
@@ -188,5 +217,21 @@ export class DeckService {
       this.deckModel.deleteMany({ creator: creatorId }),
       this.cardService.removeCardsFromDecks(decks.map(deck => deck._id.toString()))
     ])
+  }
+
+  private calculateNewCardsAmount(deck: DeckDocument & { newCardCount: number }) {
+    if (!deck.lastTimeLearned) {
+      return Math.min(deck.learningRate, deck.newCardCount)
+    }
+
+    const currentDate = new Date()
+    currentDate.setHours(0, 0, 0, 0)
+
+    let potentialNewCards = deck.learningRate;
+    if (currentDate.getTime() === deck.lastTimeLearned.getTime()) {
+        potentialNewCards = Math.max(deck.learningRate - deck.numCardsLearned, 0)
+    }
+
+    return Math.min(potentialNewCards, deck.newCardCount);
   }
 }

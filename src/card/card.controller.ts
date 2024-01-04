@@ -9,6 +9,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
 import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
 import { OwnDeckOrAdminRequest } from 'src/util/request/own-deck-or-admin.request';
+import { DeckService } from 'src/deck/deck.service';
 
 @ApiTags('Card')
 @ApiBearerAuth()
@@ -17,6 +18,7 @@ import { OwnDeckOrAdminRequest } from 'src/util/request/own-deck-or-admin.reques
 @Controller('decks/:deckId/cards')
 export class CardController {
   constructor(
+    private readonly deckService: DeckService,
     private readonly cardService: CardService
   ) {}
 
@@ -34,7 +36,7 @@ export class CardController {
 
   @Get('learn')
   async findCardsToLearn(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
-    const cards = await this.cardService.findCardsToLearn(request.deck.id, request.deck.learningRate);
+    const cards = await this.cardService.findCardsToLearn(request.deck);
     return cards.map(card => new CardDto(card));
   }
 
@@ -66,5 +68,7 @@ export class CardController {
         await this.cardService.updateCardEasy(card);
         break;
     }
+
+    await this.deckService.incrementTodayLearnedCards(request.deck)
   }
 }

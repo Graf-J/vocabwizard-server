@@ -27,6 +27,12 @@ export class Deck {
     })
     toLang: Language
 
+    @Prop({ default: 0 })
+    numCardsLearned: number
+
+    @Prop({ default: null })
+    lastTimeLearned?: Date
+
     @Prop({ 
         required: true,
         type: mongoose.Schema.Types.ObjectId,

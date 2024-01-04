@@ -59,7 +59,7 @@ export class DeckController {
 
   @UseGuards(OwnDeckOrAdminGuard)
   @Patch(':deckId/swap')
-  async swap(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
+  async swap(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) _deckId: string) {
     await this.deckService.swap(request.deck, request.user.id);
   }
 

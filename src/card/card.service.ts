@@ -150,23 +150,24 @@ export class CardService {
     return await this.cardModel.find({ deck: deckId });
   }
 
-  async findCardsToLearn(deckId: string, learningRate: number) {
+  async findCardsToLearn(deck: DeckDocument) {
     const currentDate = new Date();
 
     // Queries
     const newCardsQuery = {
-      deck: deckId,
+      deck: deck.id,
       expires: null,
     };
     const oldCardsQuery = {
-      deck: deckId,
+      deck: deck.id,
       expires: { $lt: currentDate },
     };
 
     // Options
+    const limit = this.calculateLimit(deck)
     const newCardsOptions = {
       sort: { createdAt: 1 },
-      limit: learningRate,
+      limit: limit,
     };
     const oldCardsOptions = {
       sort: { expires: 1 },
@@ -248,5 +249,21 @@ export class CardService {
     expiresDate.setHours(0, 0, 0, 0)
 
     return expiresDate;
+  }
+
+  private calculateLimit(deck: DeckDocument) {
+    if (!deck.lastTimeLearned) {
+      return deck.learningRate
+    }
+
+    const currentDate = new Date()
+    currentDate.setHours(0, 0, 0, 0)
+
+    let limit = deck.learningRate;
+    if (currentDate.getTime() === deck.lastTimeLearned.getTime()) {
+        limit = Math.max(deck.learningRate - deck.numCardsLearned, 0)
+    }
+
+    return limit;
   }
 }
