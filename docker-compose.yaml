@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  backend:
+    build: .
+    restart: on-failure:5
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongodb
+      - libretranslate
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ""
+      MONGO_INITDB_ROOT_PASSWORD: ""
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
+  libretranslate:
+    container_name: libretranslate
+    image: libretranslate/libretranslate
+    healthcheck:
+      test: ['CMD-SHELL', './venv/bin/python scripts/healthcheck.py']
+    mem_limit: 4g
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      LT_LOAD_ONLY: de,en,it,es,fr
+    restart: on-failure:5
+
+volumes:
+  mongodb_data:
