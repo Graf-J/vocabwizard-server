@@ -6,8 +6,8 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { isValidObjectId } from 'mongoose';
-import { DeckService } from 'src/deck/deck.service';
-import { Role } from 'src/user/roles.enum';
+import { DeckService } from '../../deck/deck.service';
+import { Role } from '../../user/roles.enum';
 
 @Injectable()
 export class OwnDeckOrAdminGuard implements CanActivate {

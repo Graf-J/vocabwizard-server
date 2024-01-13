@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Language } from './languages.enum';
-import { User } from 'src/user/user.schema';
+import { User } from '../user/user.schema';
 
 export type DeckDocument = HydratedDocument<Deck>;
 

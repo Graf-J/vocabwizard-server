@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { RegisterUserDto } from '../auth/dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from './roles.enum';
-import { DeckService } from 'src/deck/deck.service';
+import { DeckService } from '../deck/deck.service';
 
 @Injectable()
 export class UserService {

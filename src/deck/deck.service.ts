@@ -9,7 +9,7 @@ import { UpdateDeckDto } from './dto/update-deck.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Deck, DeckDocument } from './deck.schema';
 import mongoose, { Model, Types, isValidObjectId } from 'mongoose';
-import { CardService } from 'src/card/card.service';
+import { CardService } from '../card/card.service';
 
 @Injectable()
 export class DeckService {

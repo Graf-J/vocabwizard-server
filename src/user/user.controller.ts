@@ -8,14 +8,14 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { RequiredRole } from 'src/auth/decorator/required-role.decorator';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { RequiredRole } from '../auth/decorator/required-role.decorator';
 import { Role } from './roles.enum';
-import { RoleGuard } from 'src/auth/guard/role.guard';
+import { RoleGuard } from '../auth/guard/role.guard';
 import { UserDto } from './dto/user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
-import { AuthGuardRequest } from 'src/util/request/auth-guard.request';
+import { ObjectIdValidationPipe } from '../util/pipe/objectid-validation.pipe';
+import { AuthGuardRequest } from '../util/request/auth-guard.request';
 
 @ApiTags('User')
 @ApiBearerAuth()

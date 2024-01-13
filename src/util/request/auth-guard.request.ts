@@ -1,4 +1,4 @@
-import { Role } from 'src/user/roles.enum';
+import { Role } from '../../user/roles.enum';
 
 export interface AuthGuardRequest extends Request {
   user: {

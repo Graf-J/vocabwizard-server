@@ -3,7 +3,7 @@ import { DeckService } from './deck.service';
 import { DeckController } from './deck.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Deck, DeckSchema } from './deck.schema';
-import { CardModule } from 'src/card/card.module';
+import { CardModule } from '../card/card.module';
 
 @Module({
   imports: [

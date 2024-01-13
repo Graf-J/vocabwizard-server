@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { catchError, lastValueFrom, map } from 'rxjs';
-import { Language } from 'src/deck/languages.enum';
+import { Language } from '../deck/languages.enum';
 import LibreTranslateResponse from './response/libre-translate-response';
 import ApiResponse from './response/api-response';
 

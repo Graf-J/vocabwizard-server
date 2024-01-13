@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Role } from 'src/user/roles.enum';
+import { Role } from '../user/roles.enum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

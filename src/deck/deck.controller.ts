@@ -13,14 +13,14 @@ import {
 import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
-import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
+import { ObjectIdValidationPipe } from '../util/pipe/objectid-validation.pipe';
+import { OwnDeckOrAdminGuard } from '../auth/guard/owdDeckOrAdmin.guard';
 import { DecksDto } from './dto/decks.dto';
 import { DeckDto } from './dto/deck.dto';
-import { AuthGuardRequest } from 'src/util/request/auth-guard.request';
-import { OwnDeckOrAdminRequest } from 'src/util/request/own-deck-or-admin.request';
+import { AuthGuardRequest } from '../util/request/auth-guard.request';
+import { OwnDeckOrAdminRequest } from '../util/request/own-deck-or-admin.request';
 import { ImportDeckDto } from './dto/import-deck.dto';
 import { StatDto } from './dto/stat.dto';
 
@@ -58,7 +58,8 @@ export class DeckController {
   @Get(':deckId')
   async findOne(
     @Req() request: OwnDeckOrAdminRequest,
-    @Param('deckId', ObjectIdValidationPipe) deckId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Param('deckId', ObjectIdValidationPipe) _deckId: string,
   ) {
     return new DeckDto(request.deck);
   }
@@ -89,6 +90,7 @@ export class DeckController {
   @Patch(':deckId/swap')
   async swap(
     @Req() request: OwnDeckOrAdminRequest,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Param('deckId', ObjectIdValidationPipe) _deckId: string,
   ) {
     await this.deckService.swap(request.deck, request.user.id);

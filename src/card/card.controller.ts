@@ -12,15 +12,15 @@ import {
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 import { UpdateConfidenceDto } from './dto/update-confidence.dto';
 import { Confidence } from './confidence.enum';
 import { CardDto } from './dto/card.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ObjectIdValidationPipe } from 'src/util/pipe/objectid-validation.pipe';
-import { OwnDeckOrAdminGuard } from 'src/auth/guard/owdDeckOrAdmin.guard';
-import { OwnDeckOrAdminRequest } from 'src/util/request/own-deck-or-admin.request';
-import { DeckService } from 'src/deck/deck.service';
+import { ObjectIdValidationPipe } from '../util/pipe/objectid-validation.pipe';
+import { OwnDeckOrAdminGuard } from '../auth/guard/owdDeckOrAdmin.guard';
+import { OwnDeckOrAdminRequest } from '../util/request/own-deck-or-admin.request';
+import { DeckService } from '../deck/deck.service';
 
 @ApiTags('Card')
 @ApiBearerAuth()

@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
-import { Deck, DeckDocument } from 'src/deck/deck.schema';
-import { Language } from 'src/deck/languages.enum';
+import { Deck, DeckDocument } from '../deck/deck.schema';
+import { Language } from '../deck/languages.enum';
 import { TranslatorService } from './translator.service';
 import { LexicalInfoService } from './lexical-info.service';
 import ApiResponse from './response/api-response';
