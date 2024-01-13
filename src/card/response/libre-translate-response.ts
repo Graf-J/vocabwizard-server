@@ -1,3 +1,3 @@
 export default interface LibreTranslateResponse {
-    translatedText: string
+  translatedText: string;
 }

@@ -8,10 +8,10 @@ import { CardModule } from 'src/card/card.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Deck.name, schema: DeckSchema }]),
-    CardModule
+    CardModule,
   ],
   controllers: [DeckController],
   providers: [DeckService],
-  exports: [DeckService]
+  exports: [DeckService],
 })
 export class DeckModule {}

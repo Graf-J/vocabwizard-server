@@ -12,6 +12,6 @@ import { DeckModule } from 'src/deck/deck.module';
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports: [UserService]
+  exports: [UserService],
 })
 export class UserModule {}

@@ -10,16 +10,16 @@ import { CardModule } from './card/card.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
     AuthModule,
     UserModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1d' }
+      signOptions: { expiresIn: '1d' },
     }),
-    MongooseModule.forRoot(`${ process.env.MONGO_URI }/vocabwizard`),
+    MongooseModule.forRoot(`${process.env.MONGO_URI}/vocabwizard`),
     DeckModule,
     CardModule,
   ],

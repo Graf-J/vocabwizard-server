@@ -1,7 +1,12 @@
-import { ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
+import {
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 
 @ValidatorConstraint({ name: 'passwordStrength', async: false })
-export class PasswordStrengthConstraint implements ValidatorConstraintInterface {
+export class PasswordStrengthConstraint
+  implements ValidatorConstraintInterface
+{
   validate(value: string) {
     const numberRegex = /\d/;
     const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;

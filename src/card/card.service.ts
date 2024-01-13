@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { Deck, DeckDocument } from 'src/deck/deck.schema';
 import { Language } from 'src/deck/languages.enum';
@@ -6,7 +10,11 @@ import { TranslatorService } from './translator.service';
 import { LexicalInfoService } from './lexical-info.service';
 import ApiResponse from './response/api-response';
 import LibreTranslateResponse from './response/libre-translate-response';
-import ApiDictionaryResponse, { Definition, Meaning, Phonetic } from './response/api-dictionary-response';
+import ApiDictionaryResponse, {
+  Definition,
+  Meaning,
+  Phonetic,
+} from './response/api-dictionary-response';
 import { InjectModel } from '@nestjs/mongoose';
 import { Card, CardDocument } from './card.schema';
 import { Model } from 'mongoose';
@@ -16,24 +24,31 @@ export class CardService {
   constructor(
     private readonly translatorService: TranslatorService,
     private readonly lexicalInfoService: LexicalInfoService,
-    @InjectModel(Card.name) private readonly cardModel: Model<CardDocument>
+    @InjectModel(Card.name) private readonly cardModel: Model<CardDocument>,
   ) {}
 
   async create(createCardDto: CreateCardDto, deck: DeckDocument) {
     // Validate if Word doesn't already exist
-    const duplicate = await this.cardModel.findOne({ 
+    const duplicate = await this.cardModel.findOne({
       word: createCardDto.word,
-      deck: deck.id
+      deck: deck.id,
     });
     if (duplicate) {
-      throw new ConflictException(`The word ${ createCardDto.word } already exists in this deck`);
+      throw new ConflictException(
+        `The word ${createCardDto.word} already exists in this deck`,
+      );
     }
 
     // Get data from external APIs
-    const { libreTranslateResponse, apiDictionaryResponse } = await this.getExternalData(createCardDto.word.toLowerCase(), deck.fromLang, deck.toLang);
+    const { libreTranslateResponse, apiDictionaryResponse } =
+      await this.getExternalData(
+        createCardDto.word.toLowerCase(),
+        deck.fromLang,
+        deck.toLang,
+      );
     let externalData;
     if (!apiDictionaryResponse.error) {
-      externalData = this.extractInformation(apiDictionaryResponse.data[0])
+      externalData = this.extractInformation(apiDictionaryResponse.data[0]);
     }
 
     // Insert Card into Database
@@ -42,15 +57,16 @@ export class CardService {
       translation: libreTranslateResponse.data.translatedText,
       ...externalData,
       deck: deck,
-      createdAt: Date.now()
-    })
+      createdAt: Date.now(),
+    });
     return await card.save();
   }
 
   async copy(cards: CardDocument[], deck: Deck, swap: boolean = false) {
-    const currentDate = new Date()
-    await Promise.all(cards.map(async (card) => {
-      const newCard = new this.cardModel({
+    const currentDate = new Date();
+    await Promise.all(
+      cards.map(async (card) => {
+        const newCard = new this.cardModel({
           word: swap ? card.translation : card.word,
           translation: swap ? card.word : card.translation,
           phonetic: card.phonetic,
@@ -62,33 +78,44 @@ export class CardService {
           stage: 0,
           expires: null,
           deck: deck,
-          createdAt: currentDate
-      })
+          createdAt: currentDate,
+        });
 
-      await newCard.save();
-    }))
+        await newCard.save();
+      }),
+    );
   }
 
-  private async getExternalData(word: string, fromLang: Language, toLang: Language) {
+  private async getExternalData(
+    word: string,
+    fromLang: Language,
+    toLang: Language,
+  ) {
     let libreTranslateResponse: ApiResponse<LibreTranslateResponse>;
     let apiDictionaryResponse: ApiResponse<ApiDictionaryResponse[]>;
     if (fromLang === Language.en) {
       // Call both APIs at the same time
       [libreTranslateResponse, apiDictionaryResponse] = await Promise.all([
         this.translatorService.translate(word, fromLang, toLang),
-        this.lexicalInfoService.getInfo(word)
+        this.lexicalInfoService.getInfo(word),
       ]);
       if (libreTranslateResponse.error) {
-        throw new ConflictException(`No Translation found for ${ word }`)
+        throw new ConflictException(`No Translation found for ${word}`);
       }
     } else {
       // Call APIs one after another
-      libreTranslateResponse = await this.translatorService.translate(word, fromLang, toLang);
+      libreTranslateResponse = await this.translatorService.translate(
+        word,
+        fromLang,
+        toLang,
+      );
       if (libreTranslateResponse.error) {
-        throw new ConflictException(`No Translation found for ${ word }`)
+        throw new ConflictException(`No Translation found for ${word}`);
       }
       // Since I know the translated word has to be English, I can call this api now
-      apiDictionaryResponse = await this.lexicalInfoService.getInfo(libreTranslateResponse.data.translatedText);
+      apiDictionaryResponse = await this.lexicalInfoService.getInfo(
+        libreTranslateResponse.data.translatedText,
+      );
     }
 
     return { libreTranslateResponse, apiDictionaryResponse };
@@ -100,14 +127,16 @@ export class CardService {
 
     return {
       ...phonetic,
-      ...meanings
-    }
+      ...meanings,
+    };
   }
 
   private extractPhonetic(apiDictionaryResponse: ApiDictionaryResponse) {
     let phonetic;
     let audioLink;
-    const audioPhonetic = apiDictionaryResponse.phonetics.find((p: Phonetic) => p.audio)
+    const audioPhonetic = apiDictionaryResponse.phonetics.find(
+      (p: Phonetic) => p.audio,
+    );
     if (audioPhonetic) {
       phonetic = audioPhonetic.text;
       audioLink = audioPhonetic.audio;
@@ -117,23 +146,23 @@ export class CardService {
 
     return {
       phonetic,
-      audioLink
+      audioLink,
     };
   }
 
   private extractMeaning(meanings: Meaning[]) {
     let synonyms: string[] = [];
     let antonyms: string[] = [];
-    let definitions: string[] = [];
-    let examples: string[] = [];
+    const definitions: string[] = [];
+    const examples: string[] = [];
     meanings.forEach((meaning: Meaning) => {
       synonyms = synonyms.concat(meaning.synonyms);
       antonyms = antonyms.concat(meaning.antonyms);
 
       meaning.definitions.forEach((definition: Definition) => {
         definitions.push(definition.definition);
-        if (definition.example){
-          examples.push(definition.example)
+        if (definition.example) {
+          examples.push(definition.example);
         }
       });
     });
@@ -142,7 +171,7 @@ export class CardService {
       synonyms,
       antonyms,
       definitions,
-      examples
+      examples,
     };
   }
 
@@ -164,18 +193,18 @@ export class CardService {
     };
 
     // Options
-    const limit = this.calculateLimit(deck)
+    const limit = this.calculateLimit(deck);
     const newCardsOptions = {
       sort: { createdAt: 1 },
       limit: limit,
     };
     const oldCardsOptions = {
       sort: { expires: 1 },
-    }
+    };
 
     const [newCards, oldCards] = await Promise.all([
       this.cardModel.find(newCardsQuery, null, newCardsOptions),
-      this.cardModel.find(oldCardsQuery, null, oldCardsOptions)
+      this.cardModel.find(oldCardsQuery, null, oldCardsOptions),
     ]);
 
     return newCards.concat(oldCards);
@@ -235,33 +264,38 @@ export class CardService {
   }
 
   private async updateCard(cardId: string, stage: number) {
-    await this.cardModel.updateOne({ _id: cardId }, { $set: {
-      stage: stage,
-      expires: this.convertStageToDate(stage)
-    } });
+    await this.cardModel.updateOne(
+      { _id: cardId },
+      {
+        $set: {
+          stage: stage,
+          expires: this.convertStageToDate(stage),
+        },
+      },
+    );
   }
 
   // expiresDate is in 2^stage days at midnight
   private convertStageToDate(stage: number) {
     const currentDate = new Date();
-    const expiresDate = new Date()
+    const expiresDate = new Date();
     expiresDate.setDate(currentDate.getDate() + Math.pow(2, stage));
-    expiresDate.setHours(0, 0, 0, 0)
+    expiresDate.setHours(0, 0, 0, 0);
 
     return expiresDate;
   }
 
   private calculateLimit(deck: DeckDocument) {
     if (!deck.lastTimeLearned) {
-      return deck.learningRate
+      return deck.learningRate;
     }
 
-    const currentDate = new Date()
-    currentDate.setHours(0, 0, 0, 0)
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
     let limit = deck.learningRate;
     if (currentDate.getTime() === deck.lastTimeLearned.getTime()) {
-        limit = Math.max(deck.learningRate - deck.numCardsLearned, 0)
+      limit = Math.max(deck.learningRate - deck.numCardsLearned, 0);
     }
 
     return limit;

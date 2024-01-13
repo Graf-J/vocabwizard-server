@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Delete, UseGuards, Req, ConflictException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  ConflictException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RequiredRole } from 'src/auth/decorator/required-role.decorator';
@@ -20,13 +28,16 @@ export class UserController {
   @Get()
   async findAll() {
     const users = await this.userService.findAll();
-    return users.map(user => new UserDto(user));
+    return users.map((user) => new UserDto(user));
   }
 
   @Delete(':id')
-  async remove(@Req() request: AuthGuardRequest, @Param('id', ObjectIdValidationPipe) id: string) {
+  async remove(
+    @Req() request: AuthGuardRequest,
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ) {
     if (request.user.id === id) {
-      throw new ConflictException('You are not allowed to delete yourself')
+      throw new ConflictException('You are not allowed to delete yourself');
     }
 
     // Throws Exception if User not found

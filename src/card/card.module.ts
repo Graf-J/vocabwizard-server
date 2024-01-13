@@ -13,12 +13,12 @@ import { CardController } from './card.controller';
     MongooseModule.forFeature([{ name: Card.name, schema: CardSchema }]),
     HttpModule.register({
       timeout: 5000,
-      maxRedirects: 5
+      maxRedirects: 5,
     }),
-    forwardRef(() => DeckModule)
+    forwardRef(() => DeckModule),
   ],
   controllers: [CardController],
   providers: [CardService, TranslatorService, LexicalInfoService],
-  exports: [CardService]
+  exports: [CardService],
 })
 export class CardModule {}

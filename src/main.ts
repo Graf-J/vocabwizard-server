@@ -25,7 +25,15 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config, {
-    extraModels: [CardDto, DeckDto, DecksDto, UserDto, AuthResponseDto, ImportDeckDto, StatDto]
+    extraModels: [
+      CardDto,
+      DeckDto,
+      DecksDto,
+      UserDto,
+      AuthResponseDto,
+      ImportDeckDto,
+      StatDto,
+    ],
   });
   SwaggerModule.setup('api', app, document);
 

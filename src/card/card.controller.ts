@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Patch, ConflictException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  Patch,
+  ConflictException,
+} from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
@@ -19,29 +30,40 @@ import { DeckService } from 'src/deck/deck.service';
 export class CardController {
   constructor(
     private readonly deckService: DeckService,
-    private readonly cardService: CardService
+    private readonly cardService: CardService,
   ) {}
 
   @Post()
-  async create(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() createCardDto: CreateCardDto) {
-    const card =  await this.cardService.create(createCardDto, request.deck);
-    return { 'id': card.id };
+  async create(
+    @Req() request: OwnDeckOrAdminRequest,
+    @Param('deckId', ObjectIdValidationPipe) deckId: string,
+    @Body() createCardDto: CreateCardDto,
+  ) {
+    const card = await this.cardService.create(createCardDto, request.deck);
+    return { id: card.id };
   }
 
   @Get()
   async findAll(@Param('deckId', ObjectIdValidationPipe) deckId: string) {
     const cards = await this.cardService.findAll(deckId);
-    return cards.map(card => new CardDto(card));
+    return cards.map((card) => new CardDto(card));
   }
 
   @Get('learn')
-  async findCardsToLearn(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
+  async findCardsToLearn(
+    @Req() request: OwnDeckOrAdminRequest,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Param('deckId', ObjectIdValidationPipe) _deckId: string,
+  ) {
     const cards = await this.cardService.findCardsToLearn(request.deck);
-    return cards.map(card => new CardDto(card));
+    return cards.map((card) => new CardDto(card));
   }
 
   @Delete(':cardId')
-  async remove(@Req() request: OwnDeckOrAdminRequest, @Param('cardId', ObjectIdValidationPipe) cardId: string) {
+  async remove(
+    @Req() request: OwnDeckOrAdminRequest,
+    @Param('cardId', ObjectIdValidationPipe) cardId: string,
+  ) {
     const card = await this.cardService.findOne(cardId);
     if (card.deck.toString() !== request.deck.id) {
       throw new ConflictException('Card does not belong to Deck');
@@ -51,13 +73,18 @@ export class CardController {
   }
 
   @Patch(':cardId/confidence')
-  async updateConfidence(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) _deckId: string, @Param('cardId', ObjectIdValidationPipe) cardId: string, @Body() updateConfidenceDto: UpdateConfidenceDto) {
+  async updateConfidence(
+    @Req() request: OwnDeckOrAdminRequest,
+    @Param('deckId', ObjectIdValidationPipe) _deckId: string,
+    @Param('cardId', ObjectIdValidationPipe) cardId: string,
+    @Body() updateConfidenceDto: UpdateConfidenceDto,
+  ) {
     const card = await this.cardService.findOne(cardId);
     if (card.deck.toString() !== request.deck.id) {
       throw new ConflictException('Card does not belong to Deck');
     }
 
-    switch(updateConfidenceDto.confidence) {
+    switch (updateConfidenceDto.confidence) {
       case Confidence.hard:
         await this.cardService.updateCardHard(card);
         break;
@@ -69,6 +96,6 @@ export class CardController {
         break;
     }
 
-    await this.deckService.incrementTodayLearnedCards(request.deck)
+    await this.deckService.incrementTodayLearnedCards(request.deck);
   }
 }

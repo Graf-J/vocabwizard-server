@@ -11,13 +11,13 @@ import { DeckService } from 'src/deck/deck.service';
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private readonly deckService: DeckService
+    private readonly deckService: DeckService,
   ) {}
 
   async create(registerUserDto: RegisterUserDto) {
     // Set Role to Admin if it is the first User
     let role = Role.user;
-    if(await this.userModel.count() === 0) {
+    if ((await this.userModel.count()) === 0) {
       role = Role.administrator;
     }
 
@@ -39,7 +39,7 @@ export class UserService {
     const user = await this.userModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException(`User not found`)
+      throw new NotFoundException(`User not found`);
     }
 
     return user;
@@ -52,7 +52,7 @@ export class UserService {
   async remove(id: string) {
     await Promise.all([
       this.userModel.deleteOne({ _id: id }),
-      this.deckService.removeDecksFromUser(id)
+      this.deckService.removeDecksFromUser(id),
     ]);
   }
 }

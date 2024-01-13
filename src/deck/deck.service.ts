@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,17 +15,17 @@ import { CardService } from 'src/card/card.service';
 export class DeckService {
   constructor(
     @InjectModel(Deck.name) private readonly deckModel: Model<DeckDocument>,
-    private readonly cardService: CardService
+    private readonly cardService: CardService,
   ) {}
 
   async create(createDeckDto: CreateDeckDto, creatorId: string) {
     // Check if Deck already exists for User
-    const duplicate = await this.deckModel.findOne({ 
+    const duplicate = await this.deckModel.findOne({
       name: createDeckDto.name,
-      creator: creatorId
-    })
+      creator: creatorId,
+    });
     if (duplicate) {
-      throw new ConflictException(`Deck already exists: ${ createDeckDto.name }`);
+      throw new ConflictException(`Deck already exists: ${createDeckDto.name}`);
     }
 
     // Insert Deck into Database
@@ -29,7 +34,7 @@ export class DeckService {
       creator: creatorId,
       createdAt: Date.now(),
     });
-    return await deck.save()
+    return await deck.save();
   }
 
   async findAll(userId: string) {
@@ -43,11 +48,11 @@ export class DeckService {
         as: 'newCards',
         pipeline: [
           {
-            $match: { expires: null }
-          }
-        ]
-      }
-    }
+            $match: { expires: null },
+          },
+        ],
+      },
+    };
     // Joins Old Cards with the Decks (cards where expires < Date.now)
     const lookupOldCards = {
       $lookup: {
@@ -55,25 +60,23 @@ export class DeckService {
         localField: '_id',
         foreignField: 'deck',
         as: 'oldCards',
-        pipeline: [
-          { $match: { expires: { $lt: currentDate } } }
-        ]
-      }
-    }
+        pipeline: [{ $match: { expires: { $lt: currentDate } } }],
+      },
+    };
     // Aggregates old and new cards into a count variable
-    const countCards = { 
+    const countCards = {
       $addFields: {
         newCardCount: { $size: '$newCards' },
         oldCardCount: { $size: '$oldCards' },
-      }
-    }
+      },
+    };
     // Excludes newCards and oldCards to save bandwidth
     const projection = {
       $project: {
         newCards: 0,
-        oldCards: 0
-      }
-    }
+        oldCards: 0,
+      },
+    };
     // Execute statements and return result
     const decks = await this.deckModel.aggregate([
       { $match: { creator: new mongoose.Types.ObjectId(userId) } },
@@ -81,10 +84,13 @@ export class DeckService {
       lookupOldCards,
       countCards,
       projection,
-      { $sort: { createdAt: 1 } }
-    ])
+      { $sort: { createdAt: 1 } },
+    ]);
 
-    return decks.map(deck => ({ ...deck, newCardCount: this.calculateNewCardsAmount(deck) }));
+    return decks.map((deck) => ({
+      ...deck,
+      newCardCount: this.calculateNewCardsAmount(deck),
+    }));
   }
 
   async findOne(id: string): Promise<DeckDocument> {
@@ -105,84 +111,93 @@ export class DeckService {
     const deck = await this.findOne(deckId);
 
     if (deck.creator.toString() == userId) {
-      throw new ConflictException('You already own this deck')
+      throw new ConflictException('You already own this deck');
     }
 
-    const newDeck = await this.create({
-      name: deck.name,
-      learningRate: deck.learningRate,
-      fromLang: deck.fromLang,
-      toLang: deck.toLang
-    }, userId)
+    const newDeck = await this.create(
+      {
+        name: deck.name,
+        learningRate: deck.learningRate,
+        fromLang: deck.fromLang,
+        toLang: deck.toLang,
+      },
+      userId,
+    );
 
-    const cards = await this.cardService.findAll(deckId)
-    await this.cardService.copy(cards, newDeck)
+    const cards = await this.cardService.findAll(deckId);
+    await this.cardService.copy(cards, newDeck);
   }
 
   async swap(deck: DeckDocument, userId: string) {
-    const newDeck = await this.create({
-      name: `${deck.name}-Reversed`,
-      learningRate: deck.learningRate,
-      fromLang: deck.toLang,
-      toLang: deck.fromLang
-    }, userId)
+    const newDeck = await this.create(
+      {
+        name: `${deck.name}-Reversed`,
+        learningRate: deck.learningRate,
+        fromLang: deck.toLang,
+        toLang: deck.fromLang,
+      },
+      userId,
+    );
 
-    const cards = await this.cardService.findAll(deck.id)
-    await this.cardService.copy(cards, newDeck, true)
+    const cards = await this.cardService.findAll(deck.id);
+    await this.cardService.copy(cards, newDeck, true);
   }
 
   async update(id: string, updateDeckDto: UpdateDeckDto, creatorId: string) {
-    const duplicate = await this.deckModel.findOne({ 
+    const duplicate = await this.deckModel.findOne({
       name: updateDeckDto.name,
-      creator: creatorId
-    })
+      creator: creatorId,
+    });
     if (duplicate && duplicate.id !== id) {
-      throw new ConflictException(`Deck already exists: ${ updateDeckDto.name }`);
+      throw new ConflictException(`Deck already exists: ${updateDeckDto.name}`);
     }
 
     return await this.deckModel.findByIdAndUpdate(
       id,
       { $set: updateDeckDto },
-      { new: true }
-    )
+      { new: true },
+    );
   }
 
   async incrementTodayLearnedCards(deck: DeckDocument) {
-    const currentDate = new Date()
-    currentDate.setHours(0, 0, 0, 0)
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
     // Update amount of cards learned today and update date in neccessary
-    if (!deck.lastTimeLearned || deck.lastTimeLearned.getTime() !== currentDate.getTime()) {
+    if (
+      !deck.lastTimeLearned ||
+      deck.lastTimeLearned.getTime() !== currentDate.getTime()
+    ) {
       await this.deckModel.findByIdAndUpdate(
         { _id: deck.id },
         {
           $set: {
             lastTimeLearned: currentDate,
-            numCardsLearned: 1
-          }
+            numCardsLearned: 1,
+          },
         },
-        { new: true }
-      )
+        { new: true },
+      );
     } else {
       await this.deckModel.findOneAndUpdate(
         { _id: deck.id },
         {
-          $inc: { numCardsLearned: 1 }
+          $inc: { numCardsLearned: 1 },
         },
-        { new: true }
-      )
+        { new: true },
+      );
     }
   }
 
   async stats(id: string) {
     const deckObjectId = new Types.ObjectId(id);
 
-    // Gets Cards from Deck with id and counts the groups by stage 
+    // Gets Cards from Deck with id and counts the groups by stage
     return await this.deckModel.aggregate([
       {
         $match: {
-          _id: deckObjectId
-        }
+          _id: deckObjectId,
+        },
       },
       {
         $lookup: {
@@ -200,14 +215,14 @@ export class DeckService {
           _id: '$cards.stage',
           count: { $sum: 1 },
         },
-      }
-    ])
+      },
+    ]);
   }
 
   async remove(id: string) {
     await Promise.all([
       this.cardService.removeCardsFromDecks([id]),
-      this.deckModel.deleteOne({ _id: id })
+      this.deckModel.deleteOne({ _id: id }),
     ]);
   }
 
@@ -215,21 +230,25 @@ export class DeckService {
     const decks = await this.deckModel.find({ creator: creatorId });
     await Promise.all([
       this.deckModel.deleteMany({ creator: creatorId }),
-      this.cardService.removeCardsFromDecks(decks.map(deck => deck._id.toString()))
-    ])
+      this.cardService.removeCardsFromDecks(
+        decks.map((deck) => deck._id.toString()),
+      ),
+    ]);
   }
 
-  private calculateNewCardsAmount(deck: DeckDocument & { newCardCount: number }) {
+  private calculateNewCardsAmount(
+    deck: DeckDocument & { newCardCount: number },
+  ) {
     if (!deck.lastTimeLearned) {
-      return Math.min(deck.learningRate, deck.newCardCount)
+      return Math.min(deck.learningRate, deck.newCardCount);
     }
 
-    const currentDate = new Date()
-    currentDate.setHours(0, 0, 0, 0)
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
     let potentialNewCards = deck.learningRate;
     if (currentDate.getTime() === deck.lastTimeLearned.getTime()) {
-        potentialNewCards = Math.max(deck.learningRate - deck.numCardsLearned, 0)
+      potentialNewCards = Math.max(deck.learningRate - deck.numCardsLearned, 0);
     }
 
     return Math.min(potentialNewCards, deck.newCardCount);

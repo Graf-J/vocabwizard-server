@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Put, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  Put,
+  Patch,
+} from '@nestjs/common';
 import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
@@ -21,45 +32,65 @@ export class DeckController {
   constructor(private readonly deckService: DeckService) {}
 
   @Post()
-  async create(@Req() request: AuthGuardRequest, @Body() createDeckDto: CreateDeckDto) {
+  async create(
+    @Req() request: AuthGuardRequest,
+    @Body() createDeckDto: CreateDeckDto,
+  ) {
     const deck = await this.deckService.create(createDeckDto, request.user.id);
-    return { 'id': deck.id };
+    return { id: deck.id };
   }
 
   @Post('import')
-  async import(@Req() request: AuthGuardRequest, @Body() importDeckDto: ImportDeckDto) {
-    await this.deckService.import(request.user.id, importDeckDto.deckId)
+  async import(
+    @Req() request: AuthGuardRequest,
+    @Body() importDeckDto: ImportDeckDto,
+  ) {
+    await this.deckService.import(request.user.id, importDeckDto.deckId);
   }
 
   @Get()
   async findAll(@Req() request: AuthGuardRequest) {
     const decks = await this.deckService.findAll(request.user.id);
-    return decks.map(deck => new DecksDto(deck));
+    return decks.map((deck) => new DecksDto(deck));
   }
 
   @UseGuards(OwnDeckOrAdminGuard)
   @Get(':deckId')
-  async findOne(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string) {
+  async findOne(
+    @Req() request: OwnDeckOrAdminRequest,
+    @Param('deckId', ObjectIdValidationPipe) deckId: string,
+  ) {
     return new DeckDto(request.deck);
   }
 
   @UseGuards(OwnDeckOrAdminGuard)
   @Get(':deckId/stats')
   async stats(@Param('deckId', ObjectIdValidationPipe) deckId: string) {
-    const stats = await this.deckService.stats(deckId)
-    return stats.map(stat => new StatDto(stat))
+    const stats = await this.deckService.stats(deckId);
+    return stats.map((stat) => new StatDto(stat));
   }
 
   @UseGuards(OwnDeckOrAdminGuard)
   @Put(':deckId')
-  async update(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) deckId: string, @Body() updateDeckDto: UpdateDeckDto) {
-    const updatedDeck =  await this.deckService.update(deckId, updateDeckDto, request.deck.creator.toString());
+  async update(
+    @Req() request: OwnDeckOrAdminRequest,
+    @Param('deckId', ObjectIdValidationPipe) deckId: string,
+    @Body() updateDeckDto: UpdateDeckDto,
+  ) {
+    const updatedDeck = await this.deckService.update(
+      deckId,
+      updateDeckDto,
+      request.deck.creator.toString(),
+    );
     return new DeckDto(updatedDeck);
   }
 
   @UseGuards(OwnDeckOrAdminGuard)
   @Patch(':deckId/swap')
-  async swap(@Req() request: OwnDeckOrAdminRequest, @Param('deckId', ObjectIdValidationPipe) _deckId: string) {
+  async swap(
+    @Req() request: OwnDeckOrAdminRequest,
+    @Param('deckId', ObjectIdValidationPipe) _deckId: string,
+  ) {
     await this.deckService.swap(request.deck, request.user.id);
   }
 
