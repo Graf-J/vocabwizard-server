@@ -15,6 +15,6 @@ export class PasswordStrengthConstraint
   }
 
   defaultMessage() {
-    return `The password must contain at least one number and one special character.`;
+    return 'The password must contain at least one number and one special character.';
   }
 }
