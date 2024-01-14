@@ -18,7 +18,7 @@ import { Confidence } from './confidence.enum';
 import { CardDto } from './dto/card.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from '../util/pipe/objectid-validation.pipe';
-import { OwnDeckOrAdminGuard } from '../auth/guard/owdDeckOrAdmin.guard';
+import { OwnDeckOrAdminGuard } from '../auth/guard/ownDeckOrAdmin.guard';
 import { OwnDeckOrAdminRequest } from '../util/request/own-deck-or-admin.request';
 import { DeckService } from '../deck/deck.service';
 

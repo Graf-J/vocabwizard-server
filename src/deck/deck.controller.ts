@@ -16,7 +16,7 @@ import { UpdateDeckDto } from './dto/update-deck.dto';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from '../util/pipe/objectid-validation.pipe';
-import { OwnDeckOrAdminGuard } from '../auth/guard/owdDeckOrAdmin.guard';
+import { OwnDeckOrAdminGuard } from '../auth/guard/ownDeckOrAdmin.guard';
 import { DecksDto } from './dto/decks.dto';
 import { DeckDto } from './dto/deck.dto';
 import { AuthGuardRequest } from '../util/request/auth-guard.request';

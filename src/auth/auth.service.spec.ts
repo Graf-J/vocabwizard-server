@@ -11,7 +11,7 @@ jest.mock('bcrypt', () => ({
 describe('AuthService', () => {
   let service: AuthService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [AuthService],
     })
@@ -19,6 +19,10 @@ describe('AuthService', () => {
       .compile();
 
     service = module.get<AuthService>(AuthService);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it('should be defined', () => {
