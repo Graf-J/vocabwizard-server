@@ -37,7 +37,7 @@ describe('AuthGuard', () => {
     const mockExecutionContext = createMock<ExecutionContext>();
     mockExecutionContext.switchToHttp().getRequest.mockReturnValue({});
 
-    await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow();
+    expect(guard.canActivate(mockExecutionContext)).rejects.toThrow();
   });
 
   it('should throw exception if DeckId is not valid', async () => {
@@ -54,10 +54,8 @@ describe('AuthGuard', () => {
 
     const responsePromise = guard.canActivate(mockExecutionContext);
 
-    await expect(responsePromise).rejects.toThrow(BadRequestException);
-    await expect(responsePromise).rejects.toThrow(
-      'Invalid ObjectId: invalidDeckId',
-    );
+    expect(responsePromise).rejects.toThrow(BadRequestException);
+    expect(responsePromise).rejects.toThrow('Invalid ObjectId: invalidDeckId');
   });
 
   it('should throw exception if user has no access', async () => {
@@ -80,8 +78,8 @@ describe('AuthGuard', () => {
 
     const responsePromise = guard.canActivate(mockExecutionContext);
 
-    await expect(responsePromise).rejects.toThrow(ForbiddenException);
-    await expect(responsePromise).rejects.toThrow(
+    expect(responsePromise).rejects.toThrow(ForbiddenException);
+    expect(responsePromise).rejects.toThrow(
       "You don't have access to this deck",
     );
   });
@@ -104,7 +102,7 @@ describe('AuthGuard', () => {
       },
     } as unknown as DeckDocument);
 
-    await expect(guard.canActivate(mockExecutionContext)).resolves.toBeTruthy();
+    expect(guard.canActivate(mockExecutionContext)).resolves.toBeTruthy();
   });
 
   it('should return true if User has access', async () => {
@@ -125,6 +123,6 @@ describe('AuthGuard', () => {
       },
     } as unknown as DeckDocument);
 
-    await expect(guard.canActivate(mockExecutionContext)).resolves.toBeTruthy();
+    expect(guard.canActivate(mockExecutionContext)).resolves.toBeTruthy();
   });
 });

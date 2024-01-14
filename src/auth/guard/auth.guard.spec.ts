@@ -41,7 +41,7 @@ describe('AuthGuard', () => {
       headers: {},
     });
 
-    await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
+    expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
       UnauthorizedException,
     );
   });
@@ -54,7 +54,7 @@ describe('AuthGuard', () => {
       },
     });
 
-    await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
+    expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
       UnauthorizedException,
     );
   });
@@ -69,7 +69,7 @@ describe('AuthGuard', () => {
 
     jwtService.verifyAsync.mockRejectedValue(ForbiddenException);
 
-    await expect(guard.canActivate(mockExecutionContext)).resolves.toBeFalsy();
+    expect(guard.canActivate(mockExecutionContext)).resolves.toBeFalsy();
   });
 
   it('should return true if token can be verified', async () => {
@@ -82,6 +82,6 @@ describe('AuthGuard', () => {
 
     jwtService.verifyAsync.mockResolvedValue({});
 
-    await expect(guard.canActivate(mockExecutionContext)).resolves.toBeTruthy();
+    expect(guard.canActivate(mockExecutionContext)).resolves.toBeTruthy();
   });
 });

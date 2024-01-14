@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 import { createMock } from '@golevelup/ts-jest';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Role } from '../user/roles.enum';
 
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
@@ -10,15 +12,21 @@ jest.mock('bcrypt', () => ({
 
 describe('AuthService', () => {
   let service: AuthService;
+  let jwtService: JwtService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
-    })
-      .useMocker(createMock)
-      .compile();
+      providers: [
+        AuthService,
+        {
+          provide: JwtService,
+          useValue: createMock<JwtService>(),
+        },
+      ],
+    }).compile();
 
-    service = module.get<AuthService>(AuthService);
+    service = module.get(AuthService);
+    jwtService = module.get(JwtService);
   });
 
   afterAll(() => {
@@ -27,6 +35,17 @@ describe('AuthService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('generateJWT', () => {
+    it('should call the signAsync method from the JwtService with arguments', () => {
+      service.generateJWT('userId', Role.user);
+
+      expect(jwtService.signAsync).toHaveBeenCalledWith({
+        sub: 'userId',
+        role: Role.user,
+      });
+    });
   });
 
   describe('validatePassword', () => {
@@ -38,8 +57,8 @@ describe('AuthService', () => {
         'passwordHash',
       );
 
-      await expect(responsePromise).rejects.toThrow(UnauthorizedException);
-      await expect(responsePromise).rejects.toThrow(
+      expect(responsePromise).rejects.toThrow(UnauthorizedException);
+      expect(responsePromise).rejects.toThrow(
         'Username or Password is not valid',
       );
     });
@@ -52,7 +71,7 @@ describe('AuthService', () => {
         'passwordHash',
       );
 
-      await expect(responsePromise).resolves.not.toThrow();
+      expect(responsePromise).resolves.not.toThrow();
     });
   });
 });

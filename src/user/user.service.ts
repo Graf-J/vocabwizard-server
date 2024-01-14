@@ -21,14 +21,14 @@ export class UserService {
       role = Role.administrator;
     }
 
-    // Create and save the User
-    const user = new this.userModel({
+    const user = await this.userModel.create({
       name: registerUserDto.name,
       passwordHash: await bcrypt.hash(registerUserDto.password, 10),
       role: role,
       createdAt: Date.now(),
     });
-    return await user.save();
+
+    return user;
   }
 
   async findAll() {
@@ -39,7 +39,7 @@ export class UserService {
     const user = await this.userModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException(`User not found`);
+      throw new NotFoundException('User not found');
     }
 
     return user;
