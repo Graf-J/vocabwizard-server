@@ -1,42 +1,49 @@
-import { PasswordStrengthConstraint } from './password-strength-constraint.validator';
+import { MatchConstraint } from './match-constraint.validator';
+import { ValidationArguments } from 'class-validator';
 
 describe('MatchConstraint', () => {
-  let passwordStrengthConstriant: PasswordStrengthConstraint;
+  let matchConstraint: MatchConstraint;
 
   beforeEach(() => {
-    passwordStrengthConstriant = new PasswordStrengthConstraint();
+    matchConstraint = new MatchConstraint();
   });
 
-  it('should return false if password has neither number nor special character', () => {
-    const password = 'test';
+  it('should return false if values do not match', () => {
+    const value = 'myValue';
+    const relatedPropertyName = 'property';
+    const relatedValue = 'differentValue';
 
-    expect(passwordStrengthConstriant.validate(password)).toBeFalsy();
-    expect(passwordStrengthConstriant.defaultMessage()).toBe(
-      'The password must contain at least one number and one special character.',
+    const args: ValidationArguments = {
+      object: {
+        [relatedPropertyName]: relatedValue,
+      },
+      property: 'testField',
+      value,
+      constraints: [relatedPropertyName],
+      targetName: '',
+    };
+
+    expect(matchConstraint.validate(value, args)).toBeFalsy();
+    expect(matchConstraint.defaultMessage(args)).toBe(
+      'The testField and property must match.',
     );
   });
 
-  it('should return false if password contains no number', () => {
-    const password = '#test';
+  it('should return false if values do not match', () => {
+    const value = 'myValue';
+    const relatedPropertyName = 'property';
+    const relatedValue = 'myValue';
 
-    expect(passwordStrengthConstriant.validate(password)).toBeFalsy();
-    expect(passwordStrengthConstriant.defaultMessage()).toBe(
-      'The password must contain at least one number and one special character.',
-    );
-  });
+    const args: ValidationArguments = {
+      object: {
+        [relatedPropertyName]: relatedValue,
+      },
+      property: 'testField',
+      value,
+      constraints: [relatedPropertyName],
+      targetName: '',
+    };
 
-  it('should return false if password contains no special character', () => {
-    const password = '9test';
-
-    expect(passwordStrengthConstriant.validate(password)).toBeFalsy();
-    expect(passwordStrengthConstriant.defaultMessage()).toBe(
-      'The password must contain at least one number and one special character.',
-    );
-  });
-
-  it('should return true if password contains a number and a special character', () => {
-    const password = '9@test';
-
-    expect(passwordStrengthConstriant.validate(password)).toBeTruthy();
+    expect(matchConstraint.validate(value, args)).toBeTruthy();
   });
 });

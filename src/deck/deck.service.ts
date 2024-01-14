@@ -29,12 +29,13 @@ export class DeckService {
     }
 
     // Insert Deck into Database
-    const deck = new this.deckModel({
+    const deck = await this.deckModel.create({
       ...createDeckDto,
       creator: creatorId,
       createdAt: Date.now(),
     });
-    return await deck.save();
+
+    return deck;
   }
 
   async findAll(userId: string) {
@@ -97,7 +98,7 @@ export class DeckService {
     const deck = await this.deckModel.findById(id);
 
     if (!deck) {
-      throw new NotFoundException(`Deck not found`);
+      throw new NotFoundException('Deck not found');
     }
 
     return deck;
@@ -236,9 +237,7 @@ export class DeckService {
     ]);
   }
 
-  private calculateNewCardsAmount(
-    deck: DeckDocument & { newCardCount: number },
-  ) {
+  calculateNewCardsAmount(deck: DeckDocument & { newCardCount: number }) {
     if (!deck.lastTimeLearned) {
       return Math.min(deck.learningRate, deck.newCardCount);
     }

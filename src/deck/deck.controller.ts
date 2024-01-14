@@ -56,7 +56,7 @@ export class DeckController {
 
   @UseGuards(OwnDeckOrAdminGuard)
   @Get(':deckId')
-  async findOne(
+  findOne(
     @Req() request: OwnDeckOrAdminRequest,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Param('deckId', ObjectIdValidationPipe) _deckId: string,

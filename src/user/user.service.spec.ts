@@ -72,7 +72,7 @@ describe('UserService', () => {
   });
 
   describe('findOne', () => {
-    it('should throw exception if not User gets found', async () => {
+    it('should throw exception if no user gets found', async () => {
       userModel.findById.mockResolvedValue(null);
 
       const responsePromise = service.findOne('1');
