@@ -36,7 +36,7 @@ export class CardController {
   @Post()
   async create(
     @Req() request: OwnDeckOrAdminRequest,
-    @Param('deckId', ObjectIdValidationPipe) deckId: string,
+    @Param('deckId', ObjectIdValidationPipe) _deckId: string,
     @Body() createCardDto: CreateCardDto,
   ) {
     const card = await this.cardService.create(createCardDto, request.deck);
