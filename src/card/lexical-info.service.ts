@@ -40,7 +40,7 @@ export class LexicalInfoService {
     return response;
   }
 
-  private removeDuplicates(meanings: Meaning[]): void {
+  removeDuplicates(meanings: Meaning[]): void {
     const allSynonyms: string[] = [];
     const allAntonyms: string[] = [];
 

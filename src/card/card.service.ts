@@ -52,21 +52,21 @@ export class CardService {
     }
 
     // Insert Card into Database
-    const card = new this.cardModel({
+    const card = await this.cardModel.create({
       word: createCardDto.word,
       translation: libreTranslateResponse.data.translatedText,
       ...externalData,
       deck: deck,
       createdAt: Date.now(),
     });
-    return await card.save();
+    return card;
   }
 
   async copy(cards: CardDocument[], deck: Deck, swap: boolean = false) {
     const currentDate = new Date();
     await Promise.all(
       cards.map(async (card) => {
-        const newCard = new this.cardModel({
+        await this.cardModel.create({
           word: swap ? card.translation : card.word,
           translation: swap ? card.word : card.translation,
           phonetic: card.phonetic,
@@ -80,17 +80,11 @@ export class CardService {
           deck: deck,
           createdAt: currentDate,
         });
-
-        await newCard.save();
       }),
     );
   }
 
-  private async getExternalData(
-    word: string,
-    fromLang: Language,
-    toLang: Language,
-  ) {
+  async getExternalData(word: string, fromLang: Language, toLang: Language) {
     let libreTranslateResponse: ApiResponse<LibreTranslateResponse>;
     let apiDictionaryResponse: ApiResponse<ApiDictionaryResponse[]>;
     if (fromLang === Language.en) {
@@ -121,7 +115,7 @@ export class CardService {
     return { libreTranslateResponse, apiDictionaryResponse };
   }
 
-  private extractInformation(apiDictionaryResponse: ApiDictionaryResponse) {
+  extractInformation(apiDictionaryResponse: ApiDictionaryResponse) {
     const phonetic = this.extractPhonetic(apiDictionaryResponse);
     const meanings = this.extractMeaning(apiDictionaryResponse.meanings);
 
@@ -131,7 +125,7 @@ export class CardService {
     };
   }
 
-  private extractPhonetic(apiDictionaryResponse: ApiDictionaryResponse) {
+  extractPhonetic(apiDictionaryResponse: ApiDictionaryResponse) {
     let phonetic;
     let audioLink;
     const audioPhonetic = apiDictionaryResponse.phonetics.find(
@@ -150,7 +144,7 @@ export class CardService {
     };
   }
 
-  private extractMeaning(meanings: Meaning[]) {
+  extractMeaning(meanings: Meaning[]) {
     let synonyms: string[] = [];
     let antonyms: string[] = [];
     const definitions: string[] = [];
@@ -263,7 +257,7 @@ export class CardService {
     await this.updateCard(card.id, stage);
   }
 
-  private async updateCard(cardId: string, stage: number) {
+  async updateCard(cardId: string, stage: number) {
     await this.cardModel.updateOne(
       { _id: cardId },
       {
@@ -276,7 +270,7 @@ export class CardService {
   }
 
   // expiresDate is in 2^stage days at midnight
-  private convertStageToDate(stage: number) {
+  convertStageToDate(stage: number) {
     const currentDate = new Date();
     const expiresDate = new Date();
     expiresDate.setDate(currentDate.getDate() + Math.pow(2, stage));
@@ -285,7 +279,7 @@ export class CardService {
     return expiresDate;
   }
 
-  private calculateLimit(deck: DeckDocument) {
+  calculateLimit(deck: DeckDocument) {
     if (!deck.lastTimeLearned) {
       return deck.learningRate;
     }
