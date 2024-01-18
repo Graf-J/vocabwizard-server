@@ -11,7 +11,7 @@ describe('AuthController', () => {
   let userService: DeepMocked<UserService>;
   let authService: DeepMocked<AuthService>;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
@@ -31,10 +31,6 @@ describe('AuthController', () => {
     authService = moduleRef.get(AuthService);
 
     authService.generateJWT.mockResolvedValue('JsonWebToken');
-  });
-
-  afterAll(() => {
-    jest.restoreAllMocks();
   });
 
   it('should be defined', () => {

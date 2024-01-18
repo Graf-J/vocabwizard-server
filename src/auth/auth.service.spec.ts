@@ -14,7 +14,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let jwtService: JwtService;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -27,10 +27,6 @@ describe('AuthService', () => {
 
     service = module.get(AuthService);
     jwtService = module.get(JwtService);
-  });
-
-  afterAll(() => {
-    jest.restoreAllMocks();
   });
 
   it('should be defined', () => {

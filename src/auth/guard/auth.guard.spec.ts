@@ -12,7 +12,7 @@ describe('AuthGuard', () => {
   let guard: AuthGuard;
   let jwtService: DeepMocked<JwtService>;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         AuthGuard,

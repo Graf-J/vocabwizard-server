@@ -9,7 +9,7 @@ describe('RoleGuard', () => {
   let guard: RoleGuard;
   let reflector: DeepMocked<Reflector>;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         RoleGuard,
@@ -22,10 +22,6 @@ describe('RoleGuard', () => {
 
     guard = moduleRef.get(RoleGuard);
     reflector = moduleRef.get(Reflector);
-  });
-
-  afterAll(() => {
-    jest.restoreAllMocks();
   });
 
   it('should return false if roles do not match', () => {

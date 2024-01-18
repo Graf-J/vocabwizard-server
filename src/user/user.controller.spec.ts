@@ -74,10 +74,14 @@ describe('UserController', () => {
   });
 
   describe('remove', () => {
-    it('should throw exception if user tries to delete himself', async () => {
-      const request = createMock<AuthGuardRequest>();
-      request.user.id = '1';
+    let request: AuthGuardRequest;
 
+    beforeEach(() => {
+      request = createMock<AuthGuardRequest>();
+      request.user.id = '1';
+    });
+
+    it('should throw exception if user tries to delete himself', async () => {
       const responsePromise = controller.remove(request, '1');
       await expect(responsePromise).rejects.toThrow(ConflictException);
       await expect(responsePromise).rejects.toThrow(
@@ -87,9 +91,6 @@ describe('UserController', () => {
     });
 
     it('should delete user', async () => {
-      const request = createMock<AuthGuardRequest>();
-      request.user.id = '1';
-
       await expect(controller.remove(request, '2')).resolves.not.toThrow();
       expect(userService.remove).toHaveBeenCalledTimes(1);
     });

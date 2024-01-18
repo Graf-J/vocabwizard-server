@@ -14,7 +14,7 @@ describe('AuthGuard', () => {
   let guard: OwnDeckOrAdminGuard;
   let deckService: DeepMocked<DeckService>;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         OwnDeckOrAdminGuard,
@@ -27,10 +27,6 @@ describe('AuthGuard', () => {
 
     guard = moduleRef.get(OwnDeckOrAdminGuard);
     deckService = moduleRef.get(DeckService);
-  });
-
-  afterAll(() => {
-    jest.restoreAllMocks();
   });
 
   it('should return false if request parameters are missing', async () => {

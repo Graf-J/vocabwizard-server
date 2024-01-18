@@ -54,12 +54,16 @@ describe('CardService', () => {
   });
 
   describe('create', () => {
-    it('should throw exception if duplicate card in deck', async () => {
-      const deckDocument = createMock<DeckDocument>();
+    let deckDocument: DeckDocument;
+    let createCardDto: CreateCardDto;
 
-      const createCardDto = createMock<CreateCardDto>();
+    beforeEach(() => {
+      deckDocument = createMock<DeckDocument>();
+
+      createCardDto = createMock<CreateCardDto>();
       createCardDto.word = 'test';
-
+    });
+    it('should throw exception if duplicate card in deck', async () => {
       cardModel.findOne.mockResolvedValue({});
 
       const responsePromise = service.create(createCardDto, deckDocument);
@@ -72,11 +76,6 @@ describe('CardService', () => {
     });
 
     it('should create a card', async () => {
-      const deckDocument = createMock<DeckDocument>();
-
-      const createCardDto = createMock<CreateCardDto>();
-      createCardDto.word = 'test';
-
       cardModel.findOne.mockResolvedValue(null);
 
       const getExternalDataSpy = jest.spyOn(service, 'getExternalData');
@@ -101,7 +100,10 @@ describe('CardService', () => {
   });
 
   describe('copy', () => {
-    it('should create new cards without swap', async () => {
+    let cards: CardDocument[];
+    let deck: Deck;
+
+    beforeEach(() => {
       const first_card = createMock<CardDocument>();
       first_card.word = 'haus';
       first_card.translation = 'house';
@@ -110,10 +112,12 @@ describe('CardService', () => {
       second_card.word = 'tier';
       second_card.translation = 'animal';
 
-      const cards = [first_card, second_card];
+      cards = [first_card, second_card];
 
-      const deck = createMock<Deck>();
+      deck = createMock<Deck>();
+    });
 
+    it('should create new cards without swap', async () => {
       await service.copy(cards, deck);
 
       expect(cardModel.create).toHaveBeenCalledTimes(2);
@@ -132,18 +136,6 @@ describe('CardService', () => {
     });
 
     it('should create new cards with swap', async () => {
-      const first_card = createMock<CardDocument>();
-      first_card.word = 'haus';
-      first_card.translation = 'house';
-
-      const second_card = createMock<CardDocument>();
-      second_card.word = 'tier';
-      second_card.translation = 'animal';
-
-      const cards = [first_card, second_card];
-
-      const deck = createMock<Deck>();
-
       await service.copy(cards, deck, true);
 
       expect(cardModel.create).toHaveBeenCalledTimes(2);
@@ -443,15 +435,17 @@ describe('CardService', () => {
 
   describe('updateCardEasy', () => {
     let updateCardSpy;
+    let card: CardDocument;
 
     beforeEach(() => {
       updateCardSpy = jest.spyOn(service, 'updateCard');
       updateCardSpy.mockResolvedValue(null);
+
+      card = createMock<CardDocument>();
+      card.id = 'id';
     });
 
     it('should update increment stage by 1 if stage is smaller than 8', async () => {
-      const card = createMock<CardDocument>();
-      card.id = 'id';
       card.stage = 3;
 
       await service.updateCardGood(card);
@@ -460,8 +454,6 @@ describe('CardService', () => {
     });
 
     it('should keep stage 8 if stage is already 8', async () => {
-      const card = createMock<CardDocument>();
-      card.id = 'id';
       card.stage = 8;
 
       await service.updateCardGood(card);
@@ -472,15 +464,17 @@ describe('CardService', () => {
 
   describe('updateCardEasy', () => {
     let updateCardSpy;
+    let card: CardDocument;
 
     beforeEach(() => {
       updateCardSpy = jest.spyOn(service, 'updateCard');
       updateCardSpy.mockResolvedValue(null);
+
+      card = createMock<CardDocument>();
+      card.id = 'id';
     });
 
     it('should update increment stage by 2 if stage is smaller than 7', async () => {
-      const card = createMock<CardDocument>();
-      card.id = 'id';
       card.stage = 3;
 
       await service.updateCardEasy(card);
@@ -489,8 +483,6 @@ describe('CardService', () => {
     });
 
     it('should update stage only to 8 if stage is already 7', async () => {
-      const card = createMock<CardDocument>();
-      card.id = 'id';
       card.stage = 7;
 
       await service.updateCardEasy(card);
