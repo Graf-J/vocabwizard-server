@@ -34,7 +34,7 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/register')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             passwordConfirmation: 'pw@1234',
           })
           .expect(400);
@@ -46,7 +46,7 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/register')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             password: 'pw@1234',
           })
           .expect(400);
@@ -75,7 +75,7 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/register')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             password: 'pw@12',
             passwordConfirmation: 'pw@12',
           })
@@ -90,7 +90,7 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/register')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             password: 'password@',
             passwordConfirmation: 'password@',
           })
@@ -105,7 +105,7 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/register')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             password: 'password1',
             passwordConfirmation: 'password1',
           })
@@ -118,17 +118,28 @@ export const authE2E = () => {
     });
 
     describe('Successfull', () => {
-      it('should register user', async () => {
+      it('should register admin user', async () => {
         const response = await request(app.getHttpServer())
           .post('/auth/register')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             password: 'pw@1234',
             passwordConfirmation: 'pw@1234',
           })
           .expect(201);
 
         expect(response.body.AccessToken).toMatch(/^ey/);
+      });
+
+      it('should register ordinary user', async () => {
+        await request(app.getHttpServer())
+          .post('/auth/register')
+          .send({
+            name: 'User',
+            password: 'pw@1234',
+            passwordConfirmation: 'pw@1234',
+          })
+          .expect(201);
       });
     });
 
@@ -137,13 +148,15 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/register')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             password: 'pw@1234',
             passwordConfirmation: 'pw@1234',
           })
           .expect(409);
 
-        expect(response.body.message).toBe('User with name Graf already exist');
+        expect(response.body.message).toBe(
+          'User with name Admin already exist',
+        );
       });
     });
   });
@@ -165,7 +178,7 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/login')
           .send({
-            name: 'Graf',
+            name: 'Admin',
           })
           .expect(400);
 
@@ -178,7 +191,7 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/login')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             password: 'pw@1234',
           })
           .expect(200);
@@ -204,7 +217,7 @@ export const authE2E = () => {
         const response = await request(app.getHttpServer())
           .post('/auth/login')
           .send({
-            name: 'Graf',
+            name: 'Admin',
             password: 'pw@12345',
           })
           .expect(401);
