@@ -15,6 +15,6 @@ export class NotMatchConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments) {
-    return `${args.property} and ${args.constraints[0]} must not match.`;
+    return `${args.property} and ${args.constraints[0]} must not match`;
   }
 }

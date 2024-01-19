@@ -24,7 +24,7 @@ describe('LangIsEnConstraint', () => {
     );
     expect(result).toBeFalsy();
     expect(langIsEnConstraint.defaultMessage(validationArguments)).toBe(
-      'Either currentLang or otherLang must be en.',
+      'Either currentLang or otherLang must be en',
     );
   });
 

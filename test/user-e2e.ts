@@ -37,7 +37,7 @@ export const userE2E = () => {
   });
 
   describe('/users (GET)', () => {
-    describe('Check AuthGuard', () => {
+    describe('AuthGuard', () => {
       it('should deny access without Access-Token', async () => {
         await request(app.getHttpServer()).get('/users').expect(401);
       });
@@ -91,7 +91,7 @@ export const userE2E = () => {
       deleteUserId = response.body[2].id;
     });
 
-    describe('Check AuthGuard', () => {
+    describe('AuthGuard', () => {
       it('should deny access without Access-Token', async () => {
         await request(app.getHttpServer())
           .delete(`/users/${deleteUserId}`)

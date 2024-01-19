@@ -24,7 +24,7 @@ describe('NotMatchConstraint', () => {
     );
     expect(result).toBeFalsy();
     expect(notMatchConstraint.defaultMessage(validationArguments)).toBe(
-      'currentValue and otherValue must not match.',
+      'currentValue and otherValue must not match',
     );
   });
 

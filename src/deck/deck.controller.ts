@@ -40,18 +40,18 @@ export class DeckController {
     return { id: deck.id };
   }
 
+  @Get()
+  async findAll(@Req() request: AuthGuardRequest) {
+    const decks = await this.deckService.findAll(request.user.id);
+    return decks.map((deck) => new DecksDto(deck));
+  }
+
   @Post('import')
   async import(
     @Req() request: AuthGuardRequest,
     @Body() importDeckDto: ImportDeckDto,
   ) {
     await this.deckService.import(request.user.id, importDeckDto.deckId);
-  }
-
-  @Get()
-  async findAll(@Req() request: AuthGuardRequest) {
-    const decks = await this.deckService.findAll(request.user.id);
-    return decks.map((deck) => new DecksDto(deck));
   }
 
   @UseGuards(OwnDeckOrAdminGuard)

@@ -16,6 +16,6 @@ export class LangIsEnConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments) {
-    return `Either ${args.property} or ${args.constraints[0]} must be ${Language.en}.`;
+    return `Either ${args.property} or ${args.constraints[0]} must be ${Language.en}`;
   }
 }
