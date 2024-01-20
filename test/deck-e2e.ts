@@ -355,7 +355,7 @@ export const deckE2E = () => {
           .expect(403);
       });
 
-      it('should not be allowed for admin to access deck from other user', async () => {
+      it('should be allowed for admin to access deck from other user', async () => {
         await request(app.getHttpServer())
           .get(`/decks/${userDeckId}`)
           .set({ Authorization: `Bearer ${adminToken}` })
@@ -430,7 +430,7 @@ export const deckE2E = () => {
           .expect(403);
       });
 
-      it('should not be allowed for admin to access stats from other user', async () => {
+      it('should be allowed for admin to access stats from other user', async () => {
         await request(app.getHttpServer())
           .get(`/decks/${userDeckId}/stats`)
           .set({ Authorization: `Bearer ${adminToken}` })
@@ -499,7 +499,7 @@ export const deckE2E = () => {
           .expect(403);
       });
 
-      it('should not be allowed for admin to update deck from other user', async () => {
+      it('should be allowed for admin to update deck from other user', async () => {
         await request(app.getHttpServer())
           .put(`/decks/${userDeckId}`)
           .set({ Authorization: `Bearer ${adminToken}` })
@@ -550,7 +550,7 @@ export const deckE2E = () => {
         );
       });
 
-      it('should reject if learning Rate is less than 1', async () => {
+      it('should reject if learningRate is less than 1', async () => {
         const response = await request(app.getHttpServer())
           .put(`/decks/${userDeckId}`)
           .set({ Authorization: `Bearer ${userToken}` })
@@ -661,7 +661,7 @@ export const deckE2E = () => {
           .expect(403);
       });
 
-      it('should not be allowed for admin to swap deck from other user', async () => {
+      it('should be allowed for admin to swap deck from other user', async () => {
         await request(app.getHttpServer())
           .patch(`/decks/${userDeckId}/swap`)
           .set({ Authorization: `Bearer ${adminToken}` })
@@ -746,7 +746,7 @@ export const deckE2E = () => {
           .expect(403);
       });
 
-      it('should not be allowed for admin to delete deck from other user', async () => {
+      it('should be allowed for admin to delete deck from other user', async () => {
         await request(app.getHttpServer())
           .delete(`/decks/${userDeckId}`)
           .set({ Authorization: `Bearer ${adminToken}` })
