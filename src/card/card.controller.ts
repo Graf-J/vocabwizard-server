@@ -21,6 +21,7 @@ import { ObjectIdValidationPipe } from '../util/pipe/objectid-validation.pipe';
 import { OwnDeckOrAdminGuard } from '../auth/guard/ownDeckOrAdmin.guard';
 import { OwnDeckOrAdminRequest } from '../util/request/own-deck-or-admin.request';
 import { DeckService } from '../deck/deck.service';
+import { CardInfoDto } from './dto/card-info.dto';
 
 @ApiTags('Card')
 @ApiBearerAuth()
@@ -46,7 +47,7 @@ export class CardController {
   @Get()
   async findAll(@Param('deckId', ObjectIdValidationPipe) deckId: string) {
     const cards = await this.cardService.findAll(deckId);
-    return cards.map((card) => new CardDto(card));
+    return cards.map((card) => new CardInfoDto(card));
   }
 
   @Get('learn')

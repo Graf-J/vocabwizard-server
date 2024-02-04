@@ -10,6 +10,7 @@ import { UserDto } from './user/dto/user.dto';
 import { AuthResponseDto } from './auth/dto/auth-response.dto';
 import { ImportDeckDto } from './deck/dto/import-deck.dto';
 import { StatDto } from './deck/dto/stat.dto';
+import { CardInfoDto } from './card/dto/card-info.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -27,6 +28,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config, {
     extraModels: [
       CardDto,
+      CardInfoDto,
       DeckDto,
       DecksDto,
       UserDto,

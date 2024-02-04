@@ -278,6 +278,9 @@ export const cardE2E = () => {
               'embody',
             ],
             antonyms: ['aberration', 'anomaly', 'ignore', 'neglect'],
+            stage: 0,
+            createdAt: expect.any(String),
+            expires: null,
           },
         ]);
       });
