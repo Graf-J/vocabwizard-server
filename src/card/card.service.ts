@@ -279,6 +279,7 @@ export class CardService {
     return expiresDate;
   }
 
+  // Calculates Limit for new cards for user for today
   calculateLimit(deck: DeckDocument) {
     if (!deck.lastTimeLearned) {
       return deck.learningRate;

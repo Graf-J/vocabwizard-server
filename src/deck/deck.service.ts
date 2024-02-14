@@ -237,6 +237,7 @@ export class DeckService {
     ]);
   }
 
+  // Calculates amount of new cards for today
   calculateNewCardsAmount(deck: DeckDocument & { newCardCount: number }) {
     if (!deck.lastTimeLearned) {
       return Math.min(deck.learningRate, deck.newCardCount);

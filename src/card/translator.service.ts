@@ -17,6 +17,7 @@ export class TranslatorService {
     this.libreTranslateUrl = configService.get('LIBRE_TRANSLATE_URL');
   }
 
+  // Builds URL and sends request to translation service
   async translate(word: string, fromLang: Language, toLang: Language) {
     const url = `${this.libreTranslateUrl}/translate`;
     const data = `q=${word}&source=${fromLang}&target=${toLang}`;
