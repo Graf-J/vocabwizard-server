@@ -113,7 +113,7 @@ Mit dem Befehl `$ npm run compodoc` im Verzeichnis des Backends kann Compodoc au
 Ich habe sämtliche Komponenten angepasst, sodass die nativ von Angular bereitgestellten Tests mit `$ npm run test` ohne Fehlermeldungen ausgeführt werden können. Ich habe diese Tests dazu verwendet um Teile meiner Applikation zu testen die mit Logik zu tun haben. Da ich die Buisiness-Logik zu einem großen Teil in das Backend ausgelagert habe werden hier eigentlich nur die Authentifizierungs-Logik geprüft. Die Tests sind völlig unabhängig vom Backend ausführbar.
 
 ### Frontend E2E-Test ausführen
-Für das End-2-End Testen des Frontends habe ich Cypress aufgesetzt. Auch hier agiert die Website komplett unabhängig vom Backend und mockt jegliche Zugriffe auf externe Schnittstellen. Cypress kann über `$ npm run cypress` gestartet werden. In dem geöffneten Fenster muss die Schaltfläche <b>E2E Testing</b> ausgewählt werden. Dannach können die Tests in einem Browser (ich habe immer Chrome verwendet) eingesehen und ausgeführt werden.
+Für das End-2-End Testen des Frontends habe ich Cypress aufgesetzt. Auch hier agiert die Website komplett unabhängig vom Backend und mockt jegliche Zugriffe auf externe Schnittstellen. Dass die Cypress Tests funktionieren, muss zuvor die Angular Applikation auf Port 4200 mit `$ npm run start` gestartet werden. Cypress kann über `$ npm run cypress` gestartet werden. In dem geöffneten Fenster muss die Schaltfläche <b>E2E Testing</b> ausgewählt werden. Dannach können die Tests in einem Browser (ich habe immer Chrome verwendet) eingesehen und ausgeführt werden.
 
 ## Anleitung zur Nutzung der Applikation
 Startet man die Applikation landet man zunächst auf dem Login-Screen, auf welchem man sich anmelden kann falls man einen Account hat.<br>
