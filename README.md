@@ -73,7 +73,7 @@ services:
 volumes:
   mongodb_data:
 ```
-- Mit Docker können die beiden Services über `$ docker-compose up -d` nun gestartet werden. Der LibreTranslate Container lässt sich beim ersten mal starten immer etwas Zeit bis er läuft. Auch wenn Docker den Container als running markiert benötigt der Container im Hintergrund noch einen Moment bis er tatsächlich läuft. Der Container ist erst vollständig hochgefahren, wenn er über http://localhost:5000 erreichbar ist.
+- Mit Docker können die beiden Services über `$ docker-compose up -d` nun gestartet werden. Der LibreTranslate Container lässt sich beim ersten mal starten immer etwas Zeit bis er läuft. Auch wenn Docker den Container als running markiert benötigt der Container im Hintergrund noch einen Moment bis er tatsächlich läuft (kann ein paar Minuten dauern). Der Container ist erst vollständig hochgefahren, wenn er über http://localhost:5000 erreichbar ist.
 - Nachdem die Container gestartet wurden, kann wieder in das Projekt navigiert werden `$ cd vocabwizard-server` um die tatsächliche NestJS Applikation mit `$ npm run start` zu starten.
 - Wenn alles funktioniert hat, müsste auf http://localhost:3000/api der Swagger der Applikation einsehbar sein.
 
@@ -102,7 +102,7 @@ Mit dem Befehl `$ npm run compodoc` im Verzeichnis des Backends kann Compodoc au
 
 ### Frontend ausführen
 - Das Frontend Git-Repository clonen `$ git clone https://github.com/Graf-J/vocabwizard-website.git`
-- In das Projekt navigieren `$ cd cd vocabwizard-website`
+- In das Projekt navigieren `$ cd vocabwizard-website`
 - Dependencies installieren `$ npm install`
 - Bei möglichen Vulnerabilities den folgenden Befehl ausführen `$ npm audit fix` um diese zu fixen.
 - Die Webseite starten `npm run start`
@@ -157,11 +157,11 @@ Die letzte Option <b>Delete Deck</b> bietet die Möglichkeit das Deck zusammen m
 ## Technische Details
 ### Architektur
 Die Applikation verwendet wie gefordert Angular für das Frontend und NestJS für das Backend. Außerdem wird LibreTranslate als externer Service für die Übersetzung der Wörter verwendet. Als Datenbank verwerndet die Applikation MongoDB. Um Definitionen, Beispiele, Audio etc. für ein Wort zu erhalten wird eine externe API names Dictionary API verwendet, welche über diese URL erreichbar ist: https://dictionaryapi.dev<br>
-<img width="700" src="./readme/architecture.png"><br>
+<img width="700" src="./readme/structure.png"><br>
 
 ### Datenbank Struktur
-Die Datenbank besteht aus 3 Schemas. Ein User mehrere Decks besitzen. Die Felder lastTimeLearned und numCardsLearned werden im Hintergrund dafür verwendet um zu bestimmen wie viele Karten der Nutzer am aktuellen Tag noch zu lernen hat. Ein Deck kann mehrere Karten beinhalten. Über die stage wird das expires Datum berechnet, welches bestimmt wann dem Nutzer die Karte wieder zu Lernen vorgeschlagen wird. Ist expires NULL bedeutet das, dass es sich um eine neue Karte handelt. So wird im Hintergrund über neue oder zu wiederholende Karte entschieden.<br>
-<img width="700" src="./readme/er-diagram.png"><br>
+Die Datenbank besteht aus 3 Schemas. Ein User kann mehrere Decks besitzen. Die Felder lastTimeLearned und numCardsLearned werden im Hintergrund dafür verwendet um zu bestimmen wie viele Karten der Nutzer am aktuellen Tag noch zu lernen hat. Ein Deck kann mehrere Karten beinhalten. Über die stage wird das expires Datum berechnet, welches bestimmt wann dem Nutzer die Karte wieder zu Lernen vorgeschlagen wird. Ist expires NULL bedeutet das, dass es sich um eine neue Karte handelt. So wird im Hintergrund über neue oder zu wiederholende Karte entschieden.<br>
+<img width="700" src="./readme/erd.png"><br>
 
 ### Lern-Algorithmus
 Wie bereits erwähnt arbeitet das System im Hintergrund mit Stages von 0 bis 8. Aus dieser Zahl berechnet das System über die simple Formel $2^{stage}$ die Anzahl der Tage, welche zum heutigen Tag dazuaddiert werden und somit das expire Datum ergeben. Wenn der Nutzer ein Wort also gar nicht gut kann wird er in $2^0 = 1$ Tagen erneut nach dem Wort gefragt. Beherrscht der Nutzer ein Wort extrem gut wird er in $2^8 = 256$ Tagen erneut nach dem Wort gefragt. Die Tageszeit wird hierbei immer auf Mitternacht gerundet. Die Stage wird abhängig von der Stage in dem sich das Wort aktuell befindet und auf welchen Knopf der Nutzer drückt berechnet.<br>
@@ -172,14 +172,14 @@ Die Applikation wurde so entwickelt, dass der erste Nutzer der sich in der Appli
 ### Schwierigkeiten und Probleme
 Wie man beim Testen der App relativ schnell bemerkt, sind die Ergebnisse der übersetzten Wörter von LibreTranslate und Dictionary API oftmals nicht wirklich optimal. Vor allem wenn man von einer anderen Sprache in Englisch übersetzt sind die Ergebnisse der Dictionary API unpräzise, da zuvor noch ein zusätzlicher Übersetzungsschritt erforderlich ist. Ich hatte in der nahen Vergangenheit sogar einmal das Problem, dass die Dictionary API über einen gewissen Zeitraum nicht mehr erreichbar war. Dadurch können natürlich keine Beispiele, Definitionen etc. für neu hinzugefügte Karten erzeugt werden und auf Audio-Links die in der Vergangenheit schon einmal in meiner Datenbank abgespeichert wurden waren plötzlich nicht mehr aufrufbar. Aus diesem Grund habe ich sogar einmal überlegt die Applikation nochmal abzuändern und anstatt die automatische Übersetzung mit dem Finden von Beispielen komplett durch manuelle Nutzereingaben zu ersetzen. Da das automtische Übersetzen und Finden von Definitionen, Beispielen etc. jedoch eine Kernanforderung für meine Anwendung war und die Dictionary API bis auf wenige Ausnahmen relativ stabil war habe ich mich schlussendlich trotzdem dafür entschieden die externen APIs beizubehalten. Ich bin davon ausgegangen, dass eine nicht optimale Performance von externen Diensten und APIs sich nicht auf die Benotung meiner Applikation auswirkt. Ich hoffe, dass die Dictionary API nicht wieder unerreichbar ist während meine Anwendung geprüft wird. Ob die API erreichbar ist kann relativ einfach über den Link https://dictionaryapi.dev/ überprüft werden, indem ein Beispielwort eingegeben wird und auf die Antwort der API gewartet wird.<br><br>
 
-Weil ich selber etwas unzufrieden mit den Ergebnissen der externen Dienste war habe ich sogar einen Versuch gestartet über die API von OpenAI und Promt-Engineering mit LangChain bessere Ergebnisse zu erzielen. Tatsächlich bietet dieser Ansatz grundsätzlich bessere Ergebnisse, wobei es natürlich immer mit etwas Risiko verbunden ist JSON von einem LLM generieren zu lassen, da zu einer geringen Wahrscheinlichkeit Formatierungsfehler vorkommen die nur schwer testbar und behebbar sind. Wenn sich der Ansatz interessant anhört kann das Backend einfach mit diesem Repository https://github.com/Graf-J/vocabwizard-server-v2.git ausgetauscht werden. Die .env Datei muss für dieses Backend wie folgt aussehen.
+Weil ich selber etwas unzufrieden mit den Ergebnissen der externen Dienste war habe ich sogar einen Versuch gestartet über die API von OpenAI und Promt-Engineering mit LangChain bessere Ergebnisse zu erzielen. Tatsächlich bietet dieser Ansatz grundsätzlich bessere Ergebnisse, wobei es natürlich immer mit etwas Risiko verbunden ist JSON von einem LLM generieren zu lassen, da zu einer geringen Wahrscheinlichkeit Formatierungsfehler vorkommen die nur schwer testbar und behebbar sind. Bei Interesse an der Technologie kann das bestehende Backend einfach mit diesem Repository https://github.com/Graf-J/vocabwizard-server-v2.git ausgetauscht werden. Die .env Datei muss für dieses Backend wie folgt aussehen, die restliche Konfiguration ist identisch zum bereits erklärten Backend.
 ```
 MONGO_URI=mongodb://localhost:27017
 JWT_SECRET=MySuperSecretJWTString
 DICTIONARY_API_URL=https://api.dictionaryapi.dev
 OPENAI_TOKEN=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
-Weil ich nicht davon ausgehen wollte, dass jeder einfach so bereit ist seine Kreditkarte bei OpenAI zu hinterlegen um die Gebühren für die Anfragen an die API zu zahlen und weil ich davon ausgehe dass die Performance externer Dienste sich nicht negativ auf meine Note auswirkt habe ich hier vorerst die erste Version meines Backends abgegeben.
+Weil ich nicht davon ausgehen wollte, dass jeder einfach so bereit ist seine Kreditkarteninformationen bei OpenAI zu hinterlegen und die Gebühren für die Anfragen an die API zu zahlen und weil ich davon ausgehe dass die Performance externer Dienste sich nicht negativ auf meine Note auswirkt habe ich mich entschieden die komplett kostenlose Version meiner Applikation mit Libretranslate und Dictionary API abzugenben.
 <br><br>
 
-Falls bei der Bewertung meiner Applikation die Dictionary API wirklich komplett streiken sollte würde ich mich über eine persönliche Nachricht freuen, um zusammen auf eine Lösung zu kommen. Möglicherweise könnte die OpenAI Version meiner Anwendung ja noch als Alternative verwendet werden. Da sich die beiden Versionen des Backends größtenteils überschneiden wären auch für die OpenAI Version bereits einige Tests definiert.
+Falls bei der Bewertung meiner Applikation die Dictionary API wirklich komplett streiken sollte würde ich mich über eine persönliche Nachricht freuen, um über eine Lösung des Problems zu diskutieren. Bisher war es immer so, dass die API nach spätestens einem Tag wieder erreichbar war. Möglicherweise könnte die OpenAI Version meiner Anwendung ja noch als Alternative verwendet werden. Da sich die beiden Versionen des Backends größtenteils überschneiden wären auch für die OpenAI Version bereits einige Tests definiert.
