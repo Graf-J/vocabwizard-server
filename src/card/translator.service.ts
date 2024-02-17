@@ -20,7 +20,12 @@ export class TranslatorService {
   // Builds URL and sends request to translation service
   async translate(word: string, fromLang: Language, toLang: Language) {
     const url = `${this.libreTranslateUrl}/translate`;
-    const data = `q=${word}&source=${fromLang}&target=${toLang}`;
+    const data = {
+      q: word,
+      source: fromLang,
+      target: toLang,
+      format: 'text',
+    };
     const response = await lastValueFrom(
       this.httpService.post<LibreTranslateResponse>(url, data).pipe(
         map((res) => new ApiResponse<LibreTranslateResponse>(false, res.data)),

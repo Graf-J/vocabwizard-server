@@ -17,7 +17,7 @@ import { CardModule } from './card/card.module';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
+      signOptions: { expiresIn: '7d' },
     }),
     MongooseModule.forRoot(`${process.env.MONGO_URI}/vocabwizard`),
     DeckModule,
