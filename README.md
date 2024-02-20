@@ -9,20 +9,20 @@ Entwickelt von: <b>Johannes Graf</b>
 
 ## Anforderungen an die Applikation
 - Der Nutzer möchte englische Vokablen mit Karteikarten lernen. Hierzu sollen Wörter von Deutsch, Französisch, Italienisch und Spanisch in Englisch übersetzt werden können und andersherum auch ein englisches Wort in Deutsch, Französisch, Italienisch und Spanisch.
-- Der Nutzer kann sich einfach einen Account erstellen und über Name und Passwort jederzeit anmelden
-- Der Nutzer bleibt für 7 Tage angemeldet, auch wenn der Browser neugestartet wird
-- Der Nutzer muss nur ein Wort in der jeweiligen Sprache eingeben, im Hintergrund wird nach Übersetzung, Definitionen, Beispielsätze, Synnonyme und Gegenteile für das Wort für eine bessere Lernerfahrung gesucht.
-- Um seine Karteikarten strukturieren zu können, kann der nutzer die Karteikarten in sogenannten Decks organisieren.
+- Der Nutzer kann sich einfach einen Account erstellen und sich über Namen und Passwort jederzeit anmelden.
+- Der Nutzer bleibt für 7 Tage angemeldet, auch wenn der Browser neugestartet wird.
+- Der Nutzer muss nur ein Wort in der jeweiligen Sprache eingeben, im Hintergrund wird nach Übersetzung, Definitionen, Beispielsätze, Synonyme und Gegenteile für das Wort für eine bessere Lernerfahrung gesucht.
+- Um seine Karteikarten strukturieren zu können, kann der Nutzer die Karteikarten in sogenannten Decks organisieren.
 - Für jedes Deck kann der Nutzer über die Lern-Rate konfigurieren, wie viele neue Karten pro Tag gelernt werden sollen.
-- Der Nutzer kann für die Decks einsehen, wie viele neue Karten am aktuellen Tag zu lernen sind und wie viele bereits gelernte Karten am aktellen Tag zu wiederholen sind.
-- Der Nutzer kann nach Erstellung des Decks noch Eigenschaften wie Name oder Lern-Rate modifizieren.
+- Der Nutzer kann für die Decks einsehen, wie viele neue Karten am aktuellen Tag zu lernen sind und wie viele bereits gelernte Karten am aktuellen Tag zu wiederholen sind.
+- Der Nutzer kann nach Erstellung des Decks noch Eigenschaften wie Name oder Lernrate modifizieren.
 - Decks und Karteikarten können gelöscht werden.
-- Der Nutzer kann während dem Lernen der Karteikarten auswählen wie gut er das Wort beherrscht. Basierend darauf berechnet ein Algorithmus im Hintergrund einen passenden Zeitpunkt, wann die Karte wiederholt werden soll.
+- Der Nutzer kann, während dem Lernen der Karteikarten auswählen, wie gut er das Wort beherrscht. Basierend darauf berechnet ein Algorithmus im Hintergrund einen passenden Zeitpunkt, wann die Karte wiederholt werden soll.
 - Die Nutzer können die Decks mitsamt der Karten von anderen Nutzern importieren.
-- Der Nutzer kann die Vorder- und Rückseite aller Karten eines Decks mit minimalem Aufwand vertauschen.
+- Der Nutzer kann die Vorder- und Rückseite aller Karten (Wort und Übersetzung) eines Decks mit minimalem Aufwand vertauschen.
 - Der Nutzer kann über eine Visualisierung einsehen, wie gut er die Karten seines Decks beherrscht.
 - Der Administrator ist im Gegensatz zu normalen Nutzern in der Lage auf Nutzer-Verwaltung zuzugreifen und andere Nutzer zu löschen.
-- Da Karteikarten oft unterwegs gelernt werden soll die Applikation auch für moblie Endgeräte angenehm zu bedienen sein.
+- Da Karteikarten oft unterwegs gelernt werden soll die Applikation auch für Mobile Endgeräte angenehm zu bedienen sein.
 
 ## Anleitung zum Ausführen der Applikation
 <b>Alle folgenden Befehle basieren auf Node Version v18.18.0 und npm Version 10.2.0.</b>
