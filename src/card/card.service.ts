@@ -64,6 +64,7 @@ export class CardService {
 
   async copy(cards: CardDocument[], deck: Deck, swap: boolean = false) {
     const currentDate = new Date();
+    // Copies all cards asynchronously by value to a different deck with fresh stats for expires and stage
     await Promise.all(
       cards.map(async (card) => {
         await this.cardModel.create({
@@ -97,7 +98,7 @@ export class CardService {
         throw new ConflictException(`No Translation found for ${word}`);
       }
     } else {
-      // Call APIs one after another
+      // Call APIs one after another if additional translations step is required
       libreTranslateResponse = await this.translatorService.translate(
         word,
         fromLang,
@@ -116,6 +117,7 @@ export class CardService {
   }
 
   extractInformation(apiDictionaryResponse: ApiDictionaryResponse) {
+    // Extract relevant data from the API Response
     const phonetic = this.extractPhonetic(apiDictionaryResponse);
     const meanings = this.extractMeaning(apiDictionaryResponse.meanings);
 
@@ -126,6 +128,7 @@ export class CardService {
   }
 
   extractPhonetic(apiDictionaryResponse: ApiDictionaryResponse) {
+    // Extract Phonetic information from the API response
     let phonetic;
     let audioLink;
     const audioPhonetic = apiDictionaryResponse.phonetics.find(
@@ -145,6 +148,7 @@ export class CardService {
   }
 
   extractMeaning(meanings: Meaning[]) {
+    // Extract Meaning information from the API response
     let synonyms: string[] = [];
     let antonyms: string[] = [];
     const definitions: string[] = [];
@@ -196,6 +200,7 @@ export class CardService {
       sort: { expires: 1 },
     };
 
+    // Execute queries in parallel
     const [newCards, oldCards] = await Promise.all([
       this.cardModel.find(newCardsQuery, null, newCardsOptions),
       this.cardModel.find(oldCardsQuery, null, oldCardsOptions),
@@ -279,7 +284,7 @@ export class CardService {
     return expiresDate;
   }
 
-  // Calculates Limit for new cards for user for today
+  // Calculates Limit for new cards for user for today, concerning there can't be more new cards than the Learning-Rate allows
   calculateLimit(deck: DeckDocument) {
     if (!deck.lastTimeLearned) {
       return deck.learningRate;
